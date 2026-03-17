@@ -198,10 +198,10 @@ function createFood(width) {
 
 function createShark(width, height) {
   const dir = Math.random() > 0.5 ? 1 : -1;
-  const body =
-    dir === 1
-      ? "___/\\__^/\\____>="
-      : "=<____/\\^__\\/\\___";
+  // Single-line shark that actually looks like a shark
+  const body = dir === 1 
+    ? "    /\\    ___)))>=======>"
+    : "<=======(((___    /\\    ";
   return {
     x: dir === 1 ? -body.length : width + body.length,
     y: rand(3, Math.max(5, height * 0.55)),
@@ -333,7 +333,7 @@ function updateShark(dt) {
       createBubble(
         state.width,
         state.height,
-        shark.x + (shark.dir === 1 ? 1 : shark.body.length - 2),
+        shark.x + (shark.dir === 1 ? shark.body.length - 6 : 5),
         shark.y + 1
       )
     );
