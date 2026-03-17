@@ -10,6 +10,14 @@ const MAX_BUBBLES = 120;
 const SEAWEED_SPACING = 8;
 const ESC = "\x1b[";
 const RESET = "\x1b[0m";
+const FEEDING_FRENZY_SECONDS = 6.5;
+
+const LIGHTING_MODES = {
+  AUTO: "auto",
+  NIGHT: "night",
+  NEON: "neon",
+  ABYSS: "abyss",
+};
 
 const RIGHT_SHAPES = [
   "><>",
@@ -38,7 +46,7 @@ function printHelp() {
     "  f  drop food",
     "  a  add fish",
     "  r  remove fish",
-    "  l  toggle lighting",
+    "  l  cycle lighting mode (auto/night/neon/abyss)",
     "  s  spawn shark",
     "  b  bubble burst",
     "  h  toggle HUD",
@@ -184,12 +192,16 @@ function createFood(width) {
     y: 2,
     vy: rand(3.5, 6.5),
     life: 0,
+    sparkle: rand(0, Math.PI * 2),
   };
 }
 
 function createShark(width, height) {
   const dir = Math.random() > 0.5 ? 1 : -1;
-  const body = dir === 1 ? "==\\____/>" : "<\\____/==";
+  const body =
+    dir === 1
+      ? "___/\\__^/\\____>="
+      : "=<____/\\^__\\/\\___";
   return {
     x: dir === 1 ? -body.length : width + body.length,
     y: rand(3, Math.max(5, height * 0.55)),
@@ -197,6 +209,7 @@ function createShark(width, height) {
     dir,
     body,
     ttl: 14,
+    phase: rand(0, Math.PI * 2),
   };
 }
 
@@ -210,10 +223,11 @@ function createState() {
     height,
     clock: 0,
     cycleOffset: rand(0, Math.PI * 2),
-    lighting: true,
+    lightingMode: LIGHTING_MODES.AUTO,
     showHud: true,
     splashMessage: "f feed  a add  r remove  l light  s shark  h hud  q quit",
     splashAge: 0,
+    feedingFrenzy: 0,
     fish: Array.from({ length: fishCount }, () => createFish(width, height)),
     bubbles: Array.from({ length: Math.min(24, Math.floor(width / 3)) }, () =>
       createBubble(width, height)
@@ -255,7 +269,8 @@ function spawnFoodBurst() {
   for (let i = 0; i < count; i += 1) {
     state.foods.push(createFood(state.width));
   }
-  state.splashMessage = "Food dropped. Hungry fish are swarming.";
+  state.feedingFrenzy = FEEDING_FRENZY_SECONDS;
+  state.splashMessage = "Feeding frenzy! The school turns instantly.";
   state.splashAge = 0;
 }
 
@@ -311,6 +326,18 @@ function updateShark(dt) {
   const shark = state.shark;
   shark.ttl -= dt;
   shark.x += shark.vx * dt;
+  shark.phase += dt * 1.3;
+
+  if (Math.random() < 0.9 * dt && state.bubbles.length < MAX_BUBBLES) {
+    state.bubbles.push(
+      createBubble(
+        state.width,
+        state.height,
+        shark.x + (shark.dir === 1 ? 1 : shark.body.length - 2),
+        shark.y + 1
+      )
+    );
+  }
 
   for (const fish of state.fish) {
     const dx = fish.x - shark.x;
@@ -378,9 +405,13 @@ function updateFish(dt) {
     }
 
     const nearestFood = findNearestFood(fish);
-    if (nearestFood && fish.hunger > 0.32) {
-      steerX += (nearestFood.x - fish.x) * 0.085;
-      steerY += (nearestFood.y - fish.y) * 0.08;
+    if (nearestFood && (state.feedingFrenzy > 0 || fish.hunger > 0.18)) {
+      const dx = nearestFood.x - fish.x;
+      const dy = nearestFood.y - fish.y;
+      const dist = Math.max(1, Math.hypot(dx, dy));
+      const pull = (state.feedingFrenzy > 0 ? 2.1 : 1) * (1 / dist) * (1 + fish.hunger * 0.85);
+      steerX += dx * 3.6 * pull;
+      steerY += dy * 3.1 * pull;
     } else {
       fish.wanderX += rand(-0.18, 0.18) * dt;
       fish.wanderY += rand(-0.12, 0.12) * dt;
@@ -489,6 +520,7 @@ function eatNearbyFood(fish) {
 function update(dt) {
   state.clock += dt;
   state.splashAge += dt;
+  state.feedingFrenzy = Math.max(0, state.feedingFrenzy - dt);
 
   if (state.splashAge > 6) {
     state.splashMessage = "f feed  a add  r remove  l light  s shark  h hud  q quit";
@@ -501,18 +533,43 @@ function update(dt) {
   updateShark(dt);
 }
 
-function getWaterTone(y) {
+function getWaterTone(x, y) {
   const depth = y / Math.max(1, state.height - 1);
-  const daylight = state.lighting ? (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2 : 0.2;
+  const wave =
+    Math.sin(x * 0.08 + state.clock * 1.6) * 0.22 +
+    Math.cos(y * 0.12 - state.clock * 1.1) * 0.18 +
+    Math.sin((x + y) * 0.03 + state.clock * 0.9) * 0.12;
+
+  const autoDaylight = (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2;
+  const daylight =
+    state.lightingMode === LIGHTING_MODES.AUTO
+      ? autoDaylight
+      : state.lightingMode === LIGHTING_MODES.NIGHT
+        ? 0.18
+        : state.lightingMode === LIGHTING_MODES.NEON
+          ? 0.72
+          : 0.06;
+
+  if (state.lightingMode === LIGHTING_MODES.NEON) {
+    const band = Math.sin(state.clock * 0.7 + x * 0.05 + y * 0.09);
+    const neonShift = band > 0.55 ? 6 : band < -0.55 ? -6 : 0;
+    const base = depth < 0.22 ? 45 : depth < 0.55 ? 39 : depth < 0.82 ? 33 : 27;
+    return clamp(base + neonShift, 16, 51);
+  }
+
+  if (state.lightingMode === LIGHTING_MODES.ABYSS) {
+    const base = depth < 0.2 ? 24 : depth < 0.55 ? 18 : depth < 0.82 ? 17 : 16;
+    return clamp(base + (wave > 0.35 ? 1 : wave < -0.35 ? -1 : 0), 16, 25);
+  }
 
   if (depth < 0.18) {
-    return daylight > 0.55 ? 117 : 81;
+    return daylight > 0.55 ? (wave > 0.35 ? 123 : 117) : 81;
   }
   if (depth < 0.5) {
-    return daylight > 0.55 ? 75 : 31;
+    return daylight > 0.55 ? (wave > 0.3 ? 81 : 75) : 31;
   }
   if (depth < 0.78) {
-    return daylight > 0.55 ? 32 : 24;
+    return daylight > 0.55 ? 32 : (wave > 0.25 ? 25 : 24);
   }
   return daylight > 0.55 ? 24 : 18;
 }
@@ -543,8 +600,8 @@ function drawBackground(buffer) {
   const floorChars = ["_", ".", ",", "_", ".", ","];
 
   for (let y = 0; y < state.height; y += 1) {
-    const waterStyle = color(getWaterTone(y));
     for (let x = 0; x < state.width; x += 1) {
+      const waterStyle = color(getWaterTone(x, y));
       const noise =
         Math.sin((x * 0.18) + state.clock * 1.35 + y * 0.41) +
         Math.cos((x * 0.07) - state.clock * 0.95 + y * 0.28);
@@ -585,8 +642,15 @@ function drawSeaweed(buffer) {
 
 function drawFood(buffer) {
   const style = bold(220);
+  const sparkleStyle = bold(229);
   for (const food of state.foods) {
-    writeCell(buffer, Math.round(food.x), Math.round(food.y), "*", style);
+    const x = Math.round(food.x);
+    const y = Math.round(food.y);
+    const sparkle = Math.sin(state.clock * 9 + food.sparkle) > 0.55 ? "+" : "*";
+    writeCell(buffer, x, y, sparkle, sparkle === "+" ? sparkleStyle : style);
+    if (state.feedingFrenzy > 0 && Math.random() < 0.12) {
+      writeCell(buffer, x + (Math.random() > 0.5 ? 1 : -1), y, ".", dim(228));
+    }
   }
 }
 
@@ -616,7 +680,8 @@ function drawShark(buffer) {
   if (!state.shark) {
     return;
   }
-  drawText(buffer, Math.round(state.shark.x), Math.round(state.shark.y), state.shark.body, bold(250));
+  const y = Math.round(state.shark.y + Math.sin(state.shark.phase) * 0.6);
+  drawText(buffer, Math.round(state.shark.x), y, state.shark.body, bold(250));
 }
 
 function drawHud(buffer) {
@@ -624,11 +689,14 @@ function drawHud(buffer) {
     return;
   }
 
-  const daylight = state.lighting ? (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2 : 0.2;
-  const mode = daylight > 0.6 ? "day" : daylight < 0.35 ? "night" : "dusk";
+  const daylight = (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2;
+  const autoPhase = daylight > 0.6 ? "day" : daylight < 0.35 ? "night" : "dusk";
+  const mode =
+    state.lightingMode === LIGHTING_MODES.AUTO ? `auto:${autoPhase}` : state.lightingMode;
   const text =
     ` ASCII Aquarium | fish ${state.fish.length} | food ${state.foods.length} | ` +
-    `bubbles ${state.bubbles.length} | light ${mode} | ${state.splashMessage}`;
+    `bubbles ${state.bubbles.length} | light ${mode} | ` +
+    `${state.feedingFrenzy > 0 ? "FRENZY! " : ""}${state.splashMessage}`;
   const hud = text.padEnd(state.width, " ").slice(0, state.width);
   drawText(buffer, 0, 0, hud, `${ESC}30;48;5;153m`);
 }
@@ -697,8 +765,15 @@ function onKeypress(_, key) {
       }
       break;
     case "l":
-      state.lighting = !state.lighting;
-      state.splashMessage = state.lighting ? "Lighting restored." : "Manual night mode engaged.";
+      state.lightingMode =
+        state.lightingMode === LIGHTING_MODES.AUTO
+          ? LIGHTING_MODES.NIGHT
+          : state.lightingMode === LIGHTING_MODES.NIGHT
+            ? LIGHTING_MODES.NEON
+            : state.lightingMode === LIGHTING_MODES.NEON
+              ? LIGHTING_MODES.ABYSS
+              : LIGHTING_MODES.AUTO;
+      state.splashMessage = `Lighting: ${state.lightingMode}`;
       state.splashAge = 0;
       break;
     case "s":
