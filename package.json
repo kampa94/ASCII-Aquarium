@@ -5,10 +5,19 @@
   "main": "src/index.js",
   "type": "commonjs",
   "bin": {
-    "ascii-aquarium": "./src/index.js"
+    "ascii-aquarium": "./src/index.js",
+    "asc": "./src/index.js"
   },
   "scripts": {
     "start": "node src/index.js"
+  },
+  "files": [
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
   },
   "keywords": [
     "ascii",
