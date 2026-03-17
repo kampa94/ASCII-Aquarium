@@ -1,0 +1,21 @@
+{
+  "name": "ascii-aquarium",
+  "version": "1.0.0",
+  "description": "A terminal-native ASCII aquarium with fish AI, particles, and dynamic lighting.",
+  "main": "src/index.js",
+  "type": "commonjs",
+  "bin": {
+    "ascii-aquarium": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js"
+  },
+  "keywords": [
+    "ascii",
+    "aquarium",
+    "terminal",
+    "ansi",
+    "cli"
+  ],
+  "license": "MIT"
+}
