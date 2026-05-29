@@ -1,7 +1,5 @@
 #!/usr/bin/env node
-
-const readline = require("readline");
-const packageJson = require("../package.json");
+import readline from "readline";
 
 const FPS = 30;
 const FRAME_MS = 1000 / FPS;
@@ -34,7 +32,7 @@ let state = null;
 let timer = null;
 let shuttingDown = false;
 
-function printHelp() {
+export function printHelp() {
   const lines = [
     "ASCII Aquarium",
     "",
@@ -56,19 +54,19 @@ function printHelp() {
   process.stdout.write(`${lines.join("\n")}\n`);
 }
 
-function clamp(value, min, max) {
+export function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
-function rand(min, max) {
+export function rand(min, max) {
   return Math.random() * (max - min) + min;
 }
 
-function pick(list) {
+export function pick(list) {
   return list[Math.floor(Math.random() * list.length)];
 }
 
-function limitMagnitude(x, y, max) {
+export function limitMagnitude(x, y, max) {
   const magnitude = Math.hypot(x, y);
   if (magnitude <= max || magnitude === 0) {
     return [x, y];
@@ -77,7 +75,7 @@ function limitMagnitude(x, y, max) {
   return [x * scale, y * scale];
 }
 
-function mirrorShape(shape) {
+export function mirrorShape(shape) {
   const pairs = {
     "<": ">",
     ">": "<",
@@ -98,35 +96,35 @@ function mirrorShape(shape) {
     .join("");
 }
 
-function color(code) {
+export function color(code) {
   return `${ESC}38;5;${code}m`;
 }
 
-function bold(code) {
+export function bold(code) {
   return `${ESC}1;38;5;${code}m`;
 }
 
-function dim(code) {
+export function dim(code) {
   return `${ESC}2;38;5;${code}m`;
 }
 
-function hideCursor() {
+export function hideCursor() {
   process.stdout.write(`${ESC}?25l`);
 }
 
-function showCursor() {
+export function showCursor() {
   process.stdout.write(`${ESC}?25h`);
 }
 
-function enterAltScreen() {
+export function enterAltScreen() {
   process.stdout.write(`${ESC}?1049h${ESC}2J${ESC}H`);
 }
 
-function leaveAltScreen() {
+export function leaveAltScreen() {
   process.stdout.write(`${ESC}?1049l`);
 }
 
-function createSeaweed(width, height) {
+export function createSeaweed(width, height) {
   const stalks = [];
   const floorY = Math.max(3, height - 2);
   for (let x = 4; x < width - 4; x += SEAWEED_SPACING) {
@@ -141,7 +139,7 @@ function createSeaweed(width, height) {
   return { stalks, floorY };
 }
 
-function createFish(width, height, options = {}) {
+export function createFish(width, height, options = {}) {
   const shape = pick(RIGHT_SHAPES);
   const dir = options.dir || (Math.random() > 0.5 ? 1 : -1);
   const personality = pick(PERSONALITIES);
@@ -174,7 +172,7 @@ function createFish(width, height, options = {}) {
   };
 }
 
-function createBubble(width, height, sourceX = rand(2, width - 2), sourceY = height - 2) {
+export function createBubble(width, height, sourceX = rand(2, width - 2), sourceY = height - 2) {
   return {
     x: sourceX + rand(-0.5, 0.5),
     y: sourceY + rand(-0.2, 0.2),
@@ -186,7 +184,7 @@ function createBubble(width, height, sourceX = rand(2, width - 2), sourceY = hei
   };
 }
 
-function createFood(width) {
+export function createFood(width) {
   return {
     x: rand(Math.max(4, width * 0.18), Math.max(5, width * 0.82)),
     y: 2,
@@ -196,7 +194,7 @@ function createFood(width) {
   };
 }
 
-function createShark(width, height) {
+export function createShark(width, height) {
   const dir = Math.random() > 0.5 ? 1 : -1;
   // Single-line shark that actually looks like a shark
   const body = dir === 1 
@@ -213,7 +211,7 @@ function createShark(width, height) {
   };
 }
 
-function createState() {
+export function createState() {
   const width = Math.max(60, process.stdout.columns || 80);
   const height = Math.max(18, process.stdout.rows || 24);
   const fishCount = Math.min(12, Math.max(6, Math.floor(width / 10)));
@@ -239,7 +237,7 @@ function createState() {
   };
 }
 
-function resizeState(nextWidth, nextHeight) {
+export function resizeState(nextWidth, nextHeight) {
   if (!state) {
     return;
   }
@@ -264,7 +262,7 @@ function resizeState(nextWidth, nextHeight) {
   }
 }
 
-function spawnFoodBurst() {
+export function spawnFoodBurst() {
   const count = Math.floor(rand(3, 7));
   for (let i = 0; i < count; i += 1) {
     state.foods.push(createFood(state.width));
@@ -274,7 +272,7 @@ function spawnFoodBurst() {
   state.splashAge = 0;
 }
 
-function spawnBubbleBurst() {
+export function spawnBubbleBurst() {
   const burstX = rand(4, state.width - 4);
   const burstY = rand(state.height * 0.55, state.height - 2);
   for (let i = 0; i < 18; i += 1) {
@@ -285,7 +283,7 @@ function spawnBubbleBurst() {
   }
 }
 
-function maybeSpawnAmbientEffects(dt) {
+export function maybeSpawnAmbientEffects(dt) {
   if (Math.random() < 0.34 * dt && state.bubbles.length < MAX_BUBBLES) {
     state.bubbles.push(createBubble(state.width, state.height));
   }
@@ -298,7 +296,7 @@ function maybeSpawnAmbientEffects(dt) {
   }
 }
 
-function updateFood(dt) {
+export function updateFood(dt) {
   state.foods = state.foods.filter((food) => {
     food.life += dt;
     food.y += food.vy * dt;
@@ -307,7 +305,7 @@ function updateFood(dt) {
   });
 }
 
-function updateBubbles(dt) {
+export function updateBubbles(dt) {
   state.bubbles = state.bubbles.filter((bubble) => {
     bubble.age += dt;
     bubble.x += bubble.vx * dt + Math.sin(state.clock * 2.4 + bubble.age * 5) * 0.03;
@@ -318,7 +316,7 @@ function updateBubbles(dt) {
   });
 }
 
-function updateShark(dt) {
+export function updateShark(dt) {
   if (!state.shark) {
     return;
   }
@@ -357,7 +355,7 @@ function updateShark(dt) {
   }
 }
 
-function updateFish(dt) {
+export function updateFish(dt) {
   for (const fish of state.fish) {
     fish.age += dt;
     fish.hunger = clamp(fish.hunger + fish.hungerRate * dt, 0, 1.5);
@@ -485,7 +483,7 @@ function updateFish(dt) {
   }
 }
 
-function findNearestFood(fish) {
+export function findNearestFood(fish) {
   let nearest = null;
   let bestDistance = Infinity;
 
@@ -502,7 +500,7 @@ function findNearestFood(fish) {
   return nearest;
 }
 
-function eatNearbyFood(fish) {
+export function eatNearbyFood(fish) {
   for (let i = state.foods.length - 1; i >= 0; i -= 1) {
     const food = state.foods[i];
     const dx = food.x - fish.x;
@@ -517,7 +515,7 @@ function eatNearbyFood(fish) {
   }
 }
 
-function update(dt) {
+export function update(dt) {
   state.clock += dt;
   state.splashAge += dt;
   state.feedingFrenzy = Math.max(0, state.feedingFrenzy - dt);
@@ -533,7 +531,7 @@ function update(dt) {
   updateShark(dt);
 }
 
-function getWaterTone(x, y) {
+export function getWaterTone(x, y) {
   const depth = y / Math.max(1, state.height - 1);
   const wave =
     Math.sin(x * 0.08 + state.clock * 1.6) * 0.22 +
@@ -574,13 +572,13 @@ function getWaterTone(x, y) {
   return daylight > 0.55 ? 24 : 18;
 }
 
-function createBuffer(width, height) {
+export function createBuffer(width, height) {
   const chars = Array.from({ length: height }, () => Array(width).fill(" "));
   const colors = Array.from({ length: height }, () => Array(width).fill(""));
   return { chars, colors };
 }
 
-function writeCell(buffer, x, y, char, style) {
+export function writeCell(buffer, x, y, char, style) {
   if (x < 0 || y < 0 || y >= buffer.chars.length || x >= buffer.chars[0].length) {
     return;
   }
@@ -588,13 +586,13 @@ function writeCell(buffer, x, y, char, style) {
   buffer.colors[y][x] = style;
 }
 
-function drawText(buffer, x, y, text, style) {
+export function drawText(buffer, x, y, text, style) {
   for (let i = 0; i < text.length; i += 1) {
     writeCell(buffer, x + i, y, text[i], style);
   }
 }
 
-function drawBackground(buffer) {
+export function drawBackground(buffer) {
   const waterChars = [" ", " ", ".", ".", ",", "`", "~"];
   const floorY = state.height - 2;
   const floorChars = ["_", ".", ",", "_", ".", ","];
@@ -619,7 +617,7 @@ function drawBackground(buffer) {
   }
 }
 
-function drawSeaweed(buffer) {
+export function drawSeaweed(buffer) {
   const floorY = state.seaweed.floorY;
   const style = color(34);
   for (const stalk of state.seaweed.stalks) {
@@ -640,7 +638,7 @@ function drawSeaweed(buffer) {
   }
 }
 
-function drawFood(buffer) {
+export function drawFood(buffer) {
   const style = bold(220);
   const sparkleStyle = bold(229);
   for (const food of state.foods) {
@@ -654,14 +652,14 @@ function drawFood(buffer) {
   }
 }
 
-function drawBubbles(buffer) {
+export function drawBubbles(buffer) {
   for (const bubble of state.bubbles) {
     const style = bubble.glyph === "." ? dim(153) : color(159);
     writeCell(buffer, Math.round(bubble.x), Math.round(bubble.y), bubble.glyph, style);
   }
 }
 
-function drawFish(buffer) {
+export function drawFish(buffer) {
   const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
   for (const fish of sorted) {
     const body = fish.dir === 1 ? fish.shape : mirrorShape(fish.shape);
@@ -676,7 +674,7 @@ function drawFish(buffer) {
   }
 }
 
-function drawShark(buffer) {
+export function drawShark(buffer) {
   if (!state.shark) {
     return;
   }
@@ -684,7 +682,7 @@ function drawShark(buffer) {
   drawText(buffer, Math.round(state.shark.x), y, state.shark.body, bold(250));
 }
 
-function drawHud(buffer) {
+export function drawHud(buffer) {
   if (!state.showHud) {
     return;
   }
@@ -701,7 +699,7 @@ function drawHud(buffer) {
   drawText(buffer, 0, 0, hud, `${ESC}30;48;5;153m`);
 }
 
-function renderBuffer(buffer) {
+export function renderBuffer(buffer) {
   let output = `${ESC}H`;
   for (let y = 0; y < buffer.chars.length; y += 1) {
     let currentStyle = "";
@@ -721,7 +719,7 @@ function renderBuffer(buffer) {
   process.stdout.write(output);
 }
 
-function render() {
+export function render() {
   const buffer = createBuffer(state.width, state.height);
   drawBackground(buffer);
   drawSeaweed(buffer);
@@ -733,7 +731,7 @@ function render() {
   renderBuffer(buffer);
 }
 
-function onKeypress(_, key) {
+export function onKeypress(_, key) {
   if (!key) {
     return;
   }
@@ -796,7 +794,7 @@ function onKeypress(_, key) {
   }
 }
 
-function shutdown() {
+export function shutdown() {
   if (shuttingDown) {
     return;
   }
@@ -817,7 +815,7 @@ function shutdown() {
   leaveAltScreen();
 }
 
-function start() {
+export function start() {
   const args = new Set(process.argv.slice(2));
 
   if (args.has("--help") || args.has("-h")) {
@@ -871,4 +869,4 @@ function start() {
   render();
 }
 
-start();
+// start();
