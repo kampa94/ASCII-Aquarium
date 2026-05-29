@@ -1,3 +1,18 @@
+# Objective
+I'm using this handy command-line application to do some refactoring exercises. I'll try to avoid using the AI ​​tool as much as possible, to see if I still remember how it works!
+
+# Steps
+Here are the steps I plan to perform:
+- Unit testing: to fully understand the code and avoid future errors.
+
+- Migrating from JavaScript to TypeScript
+- Adding typing
+- Creating the project structure (files and folders)
+- Functional refactoring
+- Implementing the Entity Component System pattern (https://en.wikipedia.org/wiki/Entity_component_system)
+
+
+
 # ASCII Aquarium
 
 A terminal-native ASCII aquarium designed for PowerShell, Command Prompt, macOS Terminal, and Linux terminals.
