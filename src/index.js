@@ -139,38 +139,38 @@ export function createSeaweed(width, height) {
   return { stalks, floorY };
 }
 
-export function createFish(width, height, options = {}) {
-  const shape = pick(RIGHT_SHAPES);
-  const dir = options.dir || (Math.random() > 0.5 ? 1 : -1);
-  const personality = pick(PERSONALITIES);
-  const depth = options.depth ?? rand(0.15, 1);
-  const speedBase =
-    personality === "darty"
-      ? rand(10, 18)
-      : personality === "lazy"
-        ? rand(5, 8.5)
-        : rand(7.5, 12.5);
+  export function createFish(width, height, options = {}) {
+    const shape = pick(RIGHT_SHAPES);
+    const dir = options.dir || (Math.random() > 0.5 ? 1 : -1);
+    const personality = pick(PERSONALITIES);
+    const depth = options.depth ?? rand(0.15, 1);
+    const speedBase =
+      personality === "darty"
+        ? rand(10, 18)
+        : personality === "lazy"
+          ? rand(5, 8.5)
+          : rand(7.5, 12.5);
 
-  return {
-    x: options.x ?? rand(2, Math.max(3, width - shape.length - 2)),
-    y: options.y ?? rand(2, Math.max(4, height - 4)),
-    vx: dir * speedBase,
-    vy: rand(-2.4, 2.4),
-    dir,
-    shape,
-    personality,
-    speedBase,
-    hunger: rand(0.1, 0.8),
-    hungerRate: rand(0.015, 0.05),
-    color: Math.floor(rand(111, 229)),
-    depth,
-    phase: rand(0, Math.PI * 2),
-    energy: rand(0.6, 1.1),
-    wanderX: rand(-1, 1),
-    wanderY: rand(-1, 1),
-    age: 0,
-  };
-}
+    return {
+      x: options.x ?? rand(2, Math.max(3, width - shape.length - 2)),
+      y: options.y ?? rand(2, Math.max(4, height - 4)),
+      vx: dir * speedBase,
+      vy: rand(-2.4, 2.4),
+      dir,
+      shape,
+      personality,
+      speedBase,
+      hunger: rand(0.1, 0.8),
+      hungerRate: rand(0.015, 0.05),
+      color: Math.floor(rand(111, 229)),
+      depth,
+      phase: rand(0, Math.PI * 2),
+      energy: rand(0.6, 1.1),
+      wanderX: rand(-1, 1),
+      wanderY: rand(-1, 1),
+      age: 0,
+    };
+  }
 
 export function createBubble(width, height, sourceX = rand(2, width - 2), sourceY = height - 2) {
   return {
