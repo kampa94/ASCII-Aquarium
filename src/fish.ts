@@ -1,12 +1,19 @@
 import {bold, clamp, color, dim, drawText, limitMagnitude, mirrorShape, pick, rand} from "./utils.js";
 import {state} from "./index.js";
-import {RIGHT_SHAPES,PERSONALITIES} from "./constants.js"
+import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
 import {spawnBubbleBurst} from "./bubbles.js";
-export function createFish(width, height, options = {}) {
+import type {Fish} from "./types/fish.types.js";
+
+export function createFish(width: number, height: number, options: {
+    dir: number;
+    depth: any;
+    x: any;
+    y: any;
+} | undefined): Fish {
     const shape = pick(RIGHT_SHAPES);
-    const dir = options.dir || (Math.random() > 0.5 ? 1 : -1);
+    const dir = options?.dir || (Math.random() > 0.5 ? 1 : -1);
     const personality = pick(PERSONALITIES);
-    const depth = options.depth ?? rand(0.15, 1);
+    const depth = options?.depth ?? rand(0.15, 1);
     const speedBase =
         personality === "darty"
             ? rand(10, 18)
@@ -15,8 +22,10 @@ export function createFish(width, height, options = {}) {
                 : rand(7.5, 12.5);
 
     return {
-        x: options.x ?? rand(2, Math.max(3, width - shape.length - 2)),
-        y: options.y ?? rand(2, Math.max(4, height - 4)),
+        width: width,
+        height:height,
+        x: options?.x ?? rand(2, Math.max(3, width - shape.length - 2)),
+        y: options?.y ?? rand(2, Math.max(4, height - 4)),
         vx: dir * speedBase,
         vy: rand(-2.4, 2.4),
         dir,
@@ -35,7 +44,7 @@ export function createFish(width, height, options = {}) {
     };
 }
 
-export function findNearestFood(fish) {
+export function findNearestFood(fish: Fish) {
     let nearest = null;
     let bestDistance = Infinity;
 
@@ -52,22 +61,22 @@ export function findNearestFood(fish) {
     return nearest;
 }
 
-export function eatNearbyFood(fish) {
+export function eatNearbyFood(fish: Fish) {
     for (let i = state.foods.length - 1; i >= 0; i -= 1) {
         const food = state.foods[i];
-        const dx = food.x - fish.x;
-        const dy = food.y - fish.y;
+        const dx = food!.x - fish.x;
+        const dy = food!.y - fish.y;
         if (Math.hypot(dx, dy) < 1.8) {
             state.foods.splice(i, 1);
             fish.hunger = Math.max(0, fish.hunger - 0.55);
-            fish.vx *= 1.05;
+            fish.vx = (fish.vx ?? 0) * 1.05;
             spawnBubbleBurst();
             break;
         }
     }
 }
 
-export function drawFish(buffer) {
+export function drawFish(buffer: { chars: any[][]; colors: any[][]; }) {
     const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
     for (const fish of sorted) {
         const body = fish.dir === 1 ? fish.shape : mirrorShape(fish.shape);
@@ -81,7 +90,8 @@ export function drawFish(buffer) {
         drawText(buffer, Math.round(fish.x), y, body, style);
     }
 }
-export function updateFish(dt) {
+
+export function updateFish(dt: number) {
     for (const fish of state.fish) {
         fish.age += dt;
         fish.hunger = clamp(fish.hunger + fish.hungerRate * dt, 0, 1.5);
@@ -104,8 +114,8 @@ export function updateFish(dt) {
 
             if (distance < 14) {
                 neighbors += 1;
-                alignX += other.vx;
-                alignY += other.vy;
+                alignX += fish.vx ?? 0;
+                alignY += other.vy ?? 0;
                 cohesionX += other.x;
                 cohesionY += other.y;
             }
@@ -120,8 +130,8 @@ export function updateFish(dt) {
         let steerY = Math.sin(state.clock * 1.2 + fish.phase) * 0.6;
 
         if (neighbors > 0 && fish.personality !== "lazy") {
-            alignX = alignX / neighbors - fish.vx;
-            alignY = alignY / neighbors - fish.vy;
+            alignX = alignX / neighbors - (fish.vx ?? 0);
+            alignY = alignY / neighbors - (fish.vy ?? 0);
             cohesionX = cohesionX / neighbors - fish.x;
             cohesionY = cohesionY / neighbors - fish.y;
             steerX += alignX * 0.012 + cohesionX * 0.01 + separationX * 0.85;
@@ -174,37 +184,37 @@ export function updateFish(dt) {
         }
 
         const hungerBoost = 1 + fish.hunger * 0.5;
-        fish.vx += steerX * dt * hungerBoost;
-        fish.vy += steerY * dt;
+        fish.vx = (fish.vx ?? 0) + steerX * dt * hungerBoost;
+        fish.vy = (fish.vy ?? 0) + steerY * dt;
 
         const maxSpeed =
             fish.speedBase *
             (fish.personality === "darty" ? 1.35 : fish.personality === "lazy" ? 0.85 : 1) *
             (0.92 + fish.depth * 0.5);
 
-        [fish.vx, fish.vy] = limitMagnitude(fish.vx, fish.vy, maxSpeed);
+        [fish.vx, fish.vy] = limitMagnitude((fish.vx ?? 0), fish.vy, maxSpeed);
 
-        fish.x += fish.vx * dt;
-        fish.y += fish.vy * dt;
+        fish.x += (fish.vx ?? 0) * dt;
+        fish.y += (fish.vy ?? 0) * dt;
 
         if (fish.x <= 1) {
             fish.x = 1;
-            fish.vx = Math.abs(fish.vx);
+            fish.vx = Math.abs((fish.vx ?? 0));
         }
         if (fish.x >= state.width - fish.shape.length - 1) {
             fish.x = state.width - fish.shape.length - 1;
-            fish.vx = -Math.abs(fish.vx);
+            fish.vx = -Math.abs((fish.vx ?? 0));
         }
         if (fish.y <= 2) {
             fish.y = 2;
-            fish.vy = Math.abs(fish.vy) * 0.5;
+            fish.vy = Math.abs((fish.vy ?? 0)) * 0.5;
         }
         if (fish.y >= state.height - 3) {
             fish.y = state.height - 3;
-            fish.vy = -Math.abs(fish.vy) * 0.5;
+            fish.vy = -Math.abs((fish.vy ?? 0)) * 0.5;
         }
 
-        fish.dir = fish.vx >= 0 ? 1 : -1;
+        fish.dir = (fish.vx ?? 0) >= 0 ? 1 : -1;
         eatNearbyFood(fish);
     }
 }

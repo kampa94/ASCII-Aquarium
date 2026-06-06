@@ -1,16 +1,28 @@
 #!/usr/bin/env node
-import readline from "readline";
-import {ESC, FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./constants.js";
-import {clamp, drawBackground, enterAltScreen, hideCursor, leaveAltScreen, printHelp, showCursor,rand} from "./utils.js";
-import {createShark, drawShark, updateShark} from "./shark.js";
-import {createFish, drawFish, updateFish} from "./fish.js";
-import {drawFood, spawnFoodBurst, updateFood} from "./food.js";
-import {createSeaweed, drawSeaweed} from "./seaweed.js";
-import {createBubble, drawBubbles, spawnBubbleBurst, updateBubbles} from "./bubbles.js";
-import {drawHud} from "./hud.js";
 
-export let state = null;
-export let timer = null;
+import process from "node:process";
+import {
+  clamp,
+  drawBackground,
+  enterAltScreen,
+  hideCursor,
+  leaveAltScreen,
+  printHelp,
+  rand,
+  showCursor
+} from "./utils.js";
+import {ESC, FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./constants.js";
+import {createFish, drawFish, updateFish} from "./fish.js";
+import {createBubble, drawBubbles, spawnBubbleBurst, updateBubbles} from "./bubbles.js";
+import {createSeaweed, drawSeaweed} from "./seaweed.js";
+import {createShark, drawShark, updateShark} from "./shark.js";
+import {drawFood, spawnFoodBurst, updateFood} from "./food.js";
+import {drawHud} from "./hud.js";
+import * as readline from "node:readline";
+import type {State} from "./types/state.types.js";
+
+export let state: State ;
+export let timer: string | number | NodeJS.Timeout | null | undefined ;
 export let shuttingDown = false;
 
 export function createState() {
@@ -25,10 +37,10 @@ export function createState() {
     cycleOffset: rand(0, Math.PI * 2),
     lightingMode: LIGHTING_MODES.AUTO,
     showHud: true,
-    splashMessage: "f feed  a add  r remove  l light  s shark.js  h hud  q quit",
+    splashMessage: "f feed  a add  r remove  l light  s shark.ts  h hud  q quit",
     splashAge: 0,
     feedingFrenzy: 0,
-    fish: Array.from({ length: fishCount }, () => createFish(width, height)),
+    fish: Array.from({ length: fishCount }, () => createFish(width, height, undefined)),
     bubbles: Array.from({ length: Math.min(24, Math.floor(width / 3)) }, () =>
       createBubble(width, height)
     ),
@@ -39,7 +51,7 @@ export function createState() {
   };
 }
 
-export function resizeState(nextWidth, nextHeight) {
+export function resizeState(nextWidth: number, nextHeight: number) {
   if (!state) {
     return;
   }
@@ -64,7 +76,7 @@ export function resizeState(nextWidth, nextHeight) {
   }
 }
 
-export function maybeSpawnAmbientEffects(dt) {
+export function maybeSpawnAmbientEffects(dt: number) {
   if (Math.random() < 0.34 * dt && state.bubbles.length < MAX_BUBBLES) {
     state.bubbles.push(createBubble(state.width, state.height));
   }
@@ -77,13 +89,13 @@ export function maybeSpawnAmbientEffects(dt) {
   }
 }
 
-export function update(dt) {
+export function update(dt: number) {
   state.clock += dt;
   state.splashAge += dt;
   state.feedingFrenzy = Math.max(0, state.feedingFrenzy - dt);
 
   if (state.splashAge > 6) {
-    state.splashMessage = "f feed  a add  r remove  l light  s shark.js  h hud  q quit";
+    state.splashMessage = "f feed  a add  r remove  l light  s shark.ts  h hud  q quit";
   }
 
   maybeSpawnAmbientEffects(dt);
@@ -94,7 +106,7 @@ export function update(dt) {
 }
 
 
-export function getWaterTone(x, y) {
+export function getWaterTone(x: number, y: number) {
   const depth = y / Math.max(1, state.height - 1);
   const wave =
     Math.sin(x * 0.08 + state.clock * 1.6) * 0.22 +
@@ -135,13 +147,13 @@ export function getWaterTone(x, y) {
   return daylight > 0.55 ? 24 : 18;
 }
 
-export function createBuffer(width, height) {
+export function createBuffer(width: number, height: number) {
   const chars = Array.from({ length: height }, () => Array(width).fill(" "));
   const colors = Array.from({ length: height }, () => Array(width).fill(""));
   return { chars, colors };
 }
 
-export function renderBuffer(buffer) {
+export function renderBuffer(buffer: { chars: any; colors: any; }) {
   let output = `${ESC}H`;
   for (let y = 0; y < buffer.chars.length; y += 1) {
     let currentStyle = "";
@@ -173,7 +185,7 @@ export function render() {
   renderBuffer(buffer);
 }
 
-export function onKeypress(_, key) {
+export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
   if (!key) {
     return;
   }
@@ -192,7 +204,7 @@ export function onKeypress(_, key) {
       break;
     case "a":
       if (state.fish.length < MAX_FISH) {
-        state.fish.push(createFish(state.width, state.height));
+        state.fish.push(createFish(state.width, state.height, undefined));
         state.splashMessage = "A new fish slips into the tank.";
         state.splashAge = 0;
       }

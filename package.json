@@ -2,14 +2,15 @@
   "name": "ascii-aquarium",
   "version": "1.0.0",
   "description": "A terminal-native ASCII aquarium with fish AI, particles, and dynamic lighting.",
-  "main": "src/index.js",
+  "main": "src/index.ts",
   "type": "module",
   "bin": {
-    "ascii-aquarium": "./src/index.js",
-    "asc": "./src/index.js"
+    "ascii-aquarium": "src/index.ts",
+    "asc": "src/index.ts"
   },
   "scripts": {
-    "start": "node src/index.js",
+    "build": "tsx",
+    "start": "tsx src/index.ts",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
   "files": [
@@ -29,6 +30,8 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "jest": "^30.4.2"
+    "@types/node": "^25.9.1",
+    "jest": "^30.4.2",
+    "tsx": "^4.22.4"
   }
 }

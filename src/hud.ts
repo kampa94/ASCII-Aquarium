@@ -2,7 +2,8 @@ import {state} from "./index.js";
 import {ESC, LIGHTING_MODES} from "./constants.js";
 import {drawText} from "./utils.js";
 
-export function drawHud(buffer) {
+
+export function drawHud(buffer: { chars: any[][]; colors: any[][]; }) {
     if (!state.showHud) {
         return;
     }

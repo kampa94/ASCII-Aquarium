@@ -1,4 +1,4 @@
-import * as indexFn from "../src/index.js";
+import * as indexFn from "../src/index.ts";
 import { jest } from "@jest/globals";
 
 describe("Funzioni di Utilità e Matematica", () => {

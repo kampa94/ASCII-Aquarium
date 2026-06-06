@@ -1,9 +1,11 @@
-import {color, writeCell, rand, pick} from "./utils.js";
+import {SEAWEED_SPACING} from "./constants.js";
+import {color, pick, rand, writeCell} from "./utils.js";
 import {state} from "./index.js";
-import {SEAWEED_SPACING} from "./constants.js"
+import type {Stalks} from "./types/seaweed.types.js";
 
-export function createSeaweed(width, height) {
-    const stalks = [];
+
+export function createSeaweed(width: number, height: number) {
+    const stalks:Stalks[] = [];
     const floorY = Math.max(3, height - 2);
     for (let x = 4; x < width - 4; x += SEAWEED_SPACING) {
         stalks.push({
@@ -18,7 +20,7 @@ export function createSeaweed(width, height) {
 }
 
 
-export function drawSeaweed(buffer) {
+export function drawSeaweed(buffer: { chars: any[][]; colors: any[][]; }) {
     const floorY = state.seaweed.floorY;
     const style = color(34);
     for (const stalk of state.seaweed.stalks) {

@@ -1,12 +1,13 @@
-import {getWaterTone, state} from "./index.js";
 import {ESC} from "./constants.js";
+import {getWaterTone, state} from "./index.js";
+import * as process from "node:process";
 
 export function printHelp() {
     const lines = [
         "ASCII Aquarium",
         "",
         "Usage:",
-        "  node src/index.js",
+        "  node src/index.ts",
         "  ascii-aquarium",
         "",
         "Controls:",
@@ -14,7 +15,7 @@ export function printHelp() {
         "  a  add fish",
         "  r  remove fish",
         "  l  cycle lighting mode (auto/night/neon/abyss)",
-        "  s  spawn shark.js",
+        "  s  spawn shark.ts",
         "  b  bubble burst",
         "  h  toggle HUD",
         "  q  quit",
@@ -23,19 +24,19 @@ export function printHelp() {
     process.stdout.write(`${lines.join("\n")}\n`);
 }
 
-export function clamp(value, min, max) {
+export function clamp(value: number, min: number, max: number) {
     return Math.max(min, Math.min(max, value));
 }
 
-export function rand(min, max) {
+export function rand(min: number, max: number) {
     return Math.random() * (max - min) + min;
 }
 
-export function pick(list) {
+export function pick(list: string | any[]) {
     return list[Math.floor(Math.random() * list.length)];
 }
 
-export function limitMagnitude(x, y, max) {
+export function limitMagnitude(x: number, y: number, max: number) {
     const magnitude = Math.hypot(x, y);
     if (magnitude <= max || magnitude === 0) {
         return [x, y];
@@ -44,8 +45,8 @@ export function limitMagnitude(x, y, max) {
     return [x * scale, y * scale];
 }
 
-export function mirrorShape(shape) {
-    const pairs = {
+export function mirrorShape(shape: string) {
+    const pairs: Record<string, string> = {
         "<": ">",
         ">": "<",
         "(": ")",
@@ -61,19 +62,19 @@ export function mirrorShape(shape) {
     return shape
         .split("")
         .reverse()
-        .map((char) => pairs[char] || char)
+        .map((char: string) => pairs[char] || char)
         .join("");
 }
 
-export function color(code) {
+export function color(code: number) {
     return `${ESC}38;5;${code}m`;
 }
 
-export function bold(code) {
+export function bold(code: number) {
     return `${ESC}1;38;5;${code}m`;
 }
 
-export function dim(code) {
+export function dim(code: any) {
     return `${ESC}2;38;5;${code}m`;
 }
 
@@ -92,7 +93,8 @@ export function enterAltScreen() {
 export function leaveAltScreen() {
     process.stdout.write(`${ESC}?1049l`);
 }
-export function writeCell(buffer, x, y, char, style) {
+
+export function writeCell(buffer: { chars: any; colors: any; }, x: number, y: number, char: string | undefined, style: string) {
     if (x < 0 || y < 0 || y >= buffer.chars.length || x >= buffer.chars[0].length) {
         return;
     }
@@ -100,13 +102,13 @@ export function writeCell(buffer, x, y, char, style) {
     buffer.colors[y][x] = style;
 }
 
-export function drawText(buffer, x, y, text, style) {
+export function drawText(buffer: { chars: any[][]; colors: any[][]; }, x: number, y: number, text: string | any[], style: string) {
     for (let i = 0; i < text.length; i += 1) {
         writeCell(buffer, x + i, y, text[i], style);
     }
 }
 
-export function drawBackground(buffer) {
+export function drawBackground(buffer: { chars: any; colors: any; }) {
     const waterChars = [" ", " ", ".", ".", ",", "`", "~"];
     const floorY = state.height - 2;
     const floorChars = ["_", ".", ",", "_", ".", ","];

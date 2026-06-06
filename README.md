@@ -4,7 +4,6 @@ I'm using this handy command-line application to do some refactoring exercises. 
 # Steps
 Here are the steps I plan to perform:
 - Unit testing: to fully understand the code and avoid future errors.
-
 - Migrating from JavaScript to TypeScript
 - Adding typing
 - Creating the project structure (files and folders)
@@ -31,7 +30,7 @@ A terminal-native ASCII aquarium designed for PowerShell, Command Prompt, macOS 
 If you have the project folder locally:
 
 ```bash
-node src/index.js
+node src/index.ts
 ```
 
 ## Run with npx (recommended)
