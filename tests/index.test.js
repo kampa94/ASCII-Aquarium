@@ -1,5 +1,7 @@
 import * as indexFn from "../src/index.js";
 import { jest } from "@jest/globals";
+import expect from "expect";
+import {createBubble, createFood, createShark, createState} from "../src/index.js";
 
 describe("Funzioni di Utilità e Matematica", () => {
   test("dovrebbe limitare i valori entro il range", () => {
@@ -159,5 +161,106 @@ describe("indexFn.createFish", () => {
     expect(fish.y).toBe(12);
 
     expect(fish.vx).toBeLessThan(0);
+  });
+});
+
+describe('Aquarium Simulation - Unit Tests', () => {
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    // Reset di process.stdout per controllare le dimensioni dello schermo
+    Object.defineProperty(process.stdout, 'columns', { value: 80, writable: true });
+    Object.defineProperty(process.stdout, 'rows', { value: 24, writable: true });
+  });
+
+  // --- TEST FOR CREATEBUBBLE ---
+  describe('createBubble', () => {
+    it('dovrebbe generare una bolla con le proprietà corrette e valori numerici', () => {
+      const bubble = createBubble(80, 24);
+
+      expect(bubble).toEqual(expect.objectContaining({
+        x: expect.any(Number),
+        y: expect.any(Number),
+        vx: expect.any(Number),
+        vy: expect.any(Number),
+        age: 0,
+        ttl: expect.any(Number),
+        glyph: expect.any(String)
+      }));
+    });
+  });
+
+  // --- TEST FOR CREATEFOOD ---
+  describe('createFood', () => {
+    it('dovrebbe generare cibo entro i limiti di larghezza dello schermo', () => {
+      const width = 100;
+      const food = createFood(width);
+
+      expect(food).toEqual(expect.objectContaining({
+        x: expect.any(Number),
+        y: 2,
+        vy: expect.any(Number),
+        life: 0,
+        sparkle: expect.any(Number)
+      }));
+
+      expect(food.x).toBeGreaterThanOrEqual(4);
+      expect(food.x).toBeLessThanOrEqual(width);
+    });
+  });
+
+  // --- TEST FOR CREATESHARK ---
+  describe('createShark', () => {
+    it('dovrebbe orientare lo squalo a destra o a sinistra correttamente', () => {
+      // Mock Math.random per forzare la direzione a DESTRA (dir: 1)
+      jest.spyOn(Math, 'random').mockReturnValue(0.6);
+      const sharkRight = createShark(80, 24);
+      expect(sharkRight.dir).toBe(1);
+      expect(sharkRight.body).toContain('___)))>');
+      expect(sharkRight.vx).toBeGreaterThan(0);
+
+      // Mock Math.random per forzare la direzione a SINISTRA (dir: -1)
+      Math.random.mockReturnValue(0.4);
+      const sharkLeft = createShark(80, 24);
+      expect(sharkLeft.dir).toBe(-1);
+      expect(sharkLeft.body).toContain('<=======(((___    /\\    ');
+      expect(sharkLeft.vx).toBeLessThan(0);
+    });
+  });
+
+  // --- TEST FOR CREATESTATE ---
+  describe('createState', () => {
+    it('dovrebbe inizializzare lo stato globale con i valori di default corretti', () => {
+      const state = createState();
+
+      expect(state).toHaveProperty('clock', 0);
+      expect(state).toHaveProperty('lightingMode', 'auto');
+      expect(state).toHaveProperty('showHud', true);
+      expect(state).toHaveProperty('foods', []);
+      expect(state).toHaveProperty('shark', null);
+      expect(state.fish.length).toBeGreaterThan(0);
+      expect(state.bubbles.length).toBeGreaterThan(0);
+    });
+
+    it('dovrebbe calcolare le dimensioni minime di sicurezza se la console è troppo piccola', () => {
+      process.stdout.columns = 10;
+      process.stdout.rows = 5;
+
+      const state = createState();
+      // Verifica i limiti Math.max(60, ...) e Math.max(18, ...)
+      expect(state.width).toBe(60);
+      expect(state.height).toBe(18);
+    });
+
+    it('dovrebbe scalare il numero di pesci e bolle in base alla larghezza dello schermo', () => {
+      process.stdout.columns = 120;
+      const stateGrande = createState();
+
+      process.stdout.columns = 60;
+      const statePiccolo = createState();
+
+      expect(stateGrande.fish.length).toBeGreaterThanOrEqual(statePiccolo.fish.length);
+      expect(stateGrande.bubbles.length).toBeGreaterThanOrEqual(statePiccolo.bubbles.length);
+    });
   });
 });
