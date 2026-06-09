@@ -2,9 +2,10 @@ import {bold, drawText, rand} from "./utils.js";
 import {state} from "./index.js";
 import {MAX_BUBBLES} from "./constants.js";
 import {createBubble} from "./bubbles.js";
+import type {Shark} from "./types/shark.types";
 
 
-export function createShark(width: number, height: number) {
+export function createShark(width: number, height: number): Shark {
     const dir = Math.random() > 0.5 ? 1 : -1;
     // Single-line shark.js that actually looks like a shark.js
     const body = dir === 1
@@ -20,6 +21,7 @@ export function createShark(width: number, height: number) {
         phase: rand(0, Math.PI * 2),
     };
 }
+
 export function drawShark(buffer: { chars: any[][]; colors: any[][]; }) {
     if (!state.shark) {
         return;
@@ -55,8 +57,8 @@ export function updateShark(dt: number) {
         const distance = Math.hypot(dx, dy);
         if (distance < 16) {
             fish.vx = fish.vx ? undefined : fish.vx;
-            fish.vx =(fish.vx ?? 0) + Math.sign(dx || 1) * 18 * dt;
-            fish.vy =(fish.vy ?? 0)  + Math.sign(dy || 1) * 10 * dt;
+            fish.vx = (fish.vx ?? 0) + Math.sign(dx || 1) * 18 * dt;
+            fish.vy = (fish.vy ?? 0) + Math.sign(dy || 1) * 10 * dt;
             fish.hunger = Math.max(0, fish.hunger - 0.1 * dt);
         }
     }

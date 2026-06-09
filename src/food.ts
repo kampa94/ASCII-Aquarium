@@ -3,7 +3,7 @@ import {state} from "./index";
 import {FEEDING_FRENZY_SECONDS} from "./constants";
 import type {Food} from "./types/food.types.js";
 
-export function createFood(width: number) {
+export function createFood(width: number): Food {
     return {
         x: rand(Math.max(4, width * 0.18), Math.max(5, width * 0.82)),
         y: 2,
@@ -23,7 +23,6 @@ export function spawnFoodBurst() {
     state.splashAge = 0;
 }
 
-
 export function drawFood(buffer: { chars: any[][]; colors: any[][]; }) {
     const style = bold(220);
     const sparkleStyle = bold(229);
@@ -38,6 +37,7 @@ export function drawFood(buffer: { chars: any[][]; colors: any[][]; }) {
         }
     }
 }
+
 export function updateFood(dt: number) {
     state.foods = state.foods.filter((food: Food) => {
         food.life += dt;
