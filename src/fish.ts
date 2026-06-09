@@ -2,10 +2,10 @@ import {bold, clamp, color, dim, drawText, limitMagnitude, mirrorShape, pick, ra
 import {state} from "./index.js";
 import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
 import type {FishProps} from "./types/fish.types.js";
-import {Bubbles} from "./bubbles";
+import {Bubble} from "./bubble";
 
 export class Fish {
-    bubble = new Bubbles();
+    bubble = new Bubble();
 
     createFish(width: number, height: number): FishProps {
         let options = {

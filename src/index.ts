@@ -13,7 +13,7 @@ import {
 } from "./utils.js";
 import {ESC, FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./constants.js";
 import {Fish} from "./fish.js";
-import {Bubbles} from "./bubbles.js";
+import {Bubble} from "./bubble";
 import {Seaweed} from "./seaweed.js";
 import {Shark} from "./shark.js";
 import {Food} from "./food.js";
@@ -25,7 +25,7 @@ export let state: StateProps;
 export let timer: NodeJS.Timeout | null;
 export let shuttingDown = false;
 const fish: Fish = new Fish()
-const bubble: Bubbles = new Bubbles()
+const bubble: Bubble = new Bubble()
 const seaweed: Seaweed = new Seaweed()
 const hud: Hud = new Hud()
 const shark: Shark = new Shark()

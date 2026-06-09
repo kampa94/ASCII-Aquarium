@@ -3,7 +3,7 @@ import {state} from "./index.js";
 import {color, dim, writeCell, rand, pick} from "./utils.js";
 import type {BubbleProps} from "./types/bubble.types.js";
 
-export class Bubbles {
+export class Bubble {
     createBubble(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {
         return {
             x: sourceX + rand(-0.5, 0.5),
