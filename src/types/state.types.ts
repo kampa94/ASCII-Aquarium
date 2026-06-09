@@ -1,10 +1,10 @@
-import type {Fish} from "./fish.types.js";
-import type {Bubble} from "./bubble.types.js";
-import type {Food} from "./food.types.js";
-import type {Shark} from "./shark.types.js";
-import type {Seaweed} from "./seaweed.types.js";
+import type {FishProps} from "./fish.types.js";
+import type {BubbleProps} from "./bubble.types.js";
+import type {FoodProps} from "./food.types.js";
+import type {SharkProps} from "./shark.types.js";
+import type {SeaweedProps} from "./seaweed.types.js";
 
-export interface State {
+export type StateProps =  {
     width: number;
     height: number;
     clock: number;
@@ -14,10 +14,10 @@ export interface State {
     splashMessage: string;
     splashAge: number;
     feedingFrenzy: number;
-    fish: Fish[];
-    bubbles: Bubble[];
-    foods: Food[];
-    shark: Shark | null;
+    fish: FishProps[];
+    bubbles: BubbleProps[];
+    foods: FoodProps[];
+    shark: SharkProps | null;
     lastRareEvent: number;
-    seaweed: Seaweed;
+    seaweed: SeaweedProps;
 }

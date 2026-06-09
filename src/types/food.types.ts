@@ -1,4 +1,4 @@
-export interface Food {
+export type FoodProps = {
     x: number;
     y: number;
     vy: number;

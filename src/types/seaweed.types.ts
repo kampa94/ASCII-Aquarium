@@ -1,4 +1,4 @@
-export interface Seaweed {
+export type SeaweedProps = {
     stalks: Stalks[]
     floorY: number;
 }

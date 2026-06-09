@@ -1,9 +1,9 @@
 import {bold, dim, rand, writeCell} from "./utils";
 import {state} from "./index";
 import {FEEDING_FRENZY_SECONDS} from "./constants";
-import type {Food} from "./types/food.types.js";
+import type {FoodProps} from "./types/food.types.js";
 
-export function createFood(width: number): Food {
+export function createFood(width: number): FoodProps {
     return {
         x: rand(Math.max(4, width * 0.18), Math.max(5, width * 0.82)),
         y: 2,
@@ -39,7 +39,7 @@ export function drawFood(buffer: { chars: any[][]; colors: any[][]; }) {
 }
 
 export function updateFood(dt: number) {
-    state.foods = state.foods.filter((food: Food) => {
+    state.foods = state.foods.filter((food: FoodProps) => {
         food.life += dt;
         food.y += food.vy * dt;
         food.vy = Math.min(food.vy + dt * 0.65, 8);

@@ -2,9 +2,9 @@ import {bold, clamp, color, dim, drawText, limitMagnitude, mirrorShape, pick, ra
 import {state} from "./index.js";
 import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
 import {spawnBubbleBurst} from "./bubbles.js";
-import type {Fish} from "./types/fish.types.js";
+import type {FishProps} from "./types/fish.types.js";
 
-export function createFish(width: number, height: number): Fish {
+export function createFish(width: number, height: number): FishProps {
     let options = {
         dir: null,
         depth: null,
@@ -45,7 +45,7 @@ export function createFish(width: number, height: number): Fish {
     };
 }
 
-export function findNearestFood(fish: Fish) {
+export function findNearestFood(fish: FishProps) {
     let nearest = null;
     let bestDistance = Infinity;
 
@@ -62,7 +62,7 @@ export function findNearestFood(fish: Fish) {
     return nearest;
 }
 
-export function eatNearbyFood(fish: Fish) {
+export function eatNearbyFood(fish: FishProps) {
     for (let i = state.foods.length - 1; i >= 0; i -= 1) {
         const food = state.foods[i];
         const dx = food!.x - fish.x;

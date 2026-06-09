@@ -1,4 +1,4 @@
-export interface Bubble {
+export type BubbleProps = {
     x: number;
     y: number;
     vx: number;

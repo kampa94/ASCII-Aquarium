@@ -1,4 +1,4 @@
-export interface Fish {
+export type FishProps =  {
     width: number,
     height: number,
     hunger: number

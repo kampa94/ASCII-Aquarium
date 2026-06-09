@@ -1,4 +1,4 @@
-export interface Shark {
+export type SharkProps = {
     x: number;
     y: number;
     vx: number;

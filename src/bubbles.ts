@@ -1,9 +1,9 @@
 import {MAX_BUBBLES} from "./constants.js";
 import {state} from "./index.js";
 import {color, dim, writeCell, rand, pick} from "./utils.js";
-import type {Bubble} from "./types/bubble.types.js";
+import type {BubbleProps} from "./types/bubble.types.js";
 
-export function createBubble(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): Bubble {
+export function createBubble(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {
     return {
         x: sourceX + rand(-0.5, 0.5),
         y: sourceY + rand(-0.2, 0.2),
@@ -27,7 +27,7 @@ export function spawnBubbleBurst() {
 }
 
 export function updateBubbles(dt: number) {
-    state.bubbles = state.bubbles.filter((bubble: Bubble) => {
+    state.bubbles = state.bubbles.filter((bubble: BubbleProps) => {
         bubble.age += dt;
         bubble.x += bubble.vx * dt + Math.sin(state.clock * 2.4 + bubble.age * 5) * 0.03;
         bubble.y += bubble.vy * dt;

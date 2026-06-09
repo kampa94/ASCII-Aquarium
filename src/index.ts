@@ -19,13 +19,13 @@ import {createShark, drawShark, updateShark} from "./shark.js";
 import {drawFood, spawnFoodBurst, updateFood} from "./food.js";
 import {drawHud} from "./hud.js";
 import * as readline from "node:readline";
-import type {State} from "./types/state.types.js";
+import type {StateProps} from "./types/state.types.js";
 
-export let state: State;
+export let state: StateProps;
 export let timer: NodeJS.Timeout | null;
 export let shuttingDown = false;
 
-export function createState(): State {
+export function createState(): StateProps {
     const width = Math.max(60, process.stdout.columns || 80);
     const height = Math.max(18, process.stdout.rows || 24);
     const fishCount = Math.min(12, Math.max(6, Math.floor(width / 10)));

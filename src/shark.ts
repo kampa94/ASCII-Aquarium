@@ -2,10 +2,10 @@ import {bold, drawText, rand} from "./utils.js";
 import {state} from "./index.js";
 import {MAX_BUBBLES} from "./constants.js";
 import {createBubble} from "./bubbles.js";
-import type {Shark} from "./types/shark.types";
+import type {SharkProps} from "./types/shark.types";
 
 
-export function createShark(width: number, height: number): Shark {
+export function createShark(width: number, height: number): SharkProps {
     const dir = Math.random() > 0.5 ? 1 : -1;
     // Single-line shark.js that actually looks like a shark.js
     const body = dir === 1
