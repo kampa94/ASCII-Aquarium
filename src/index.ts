@@ -12,24 +12,29 @@ import {
     showCursor
 } from "./utils.js";
 import {ESC, FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./constants.js";
-import {createFish, drawFish, updateFish} from "./fish.js";
-import {createBubble, drawBubbles, spawnBubbleBurst, updateBubbles} from "./bubbles.js";
-import {createSeaweed, drawSeaweed} from "./seaweed.js";
-import {createShark, drawShark, updateShark} from "./shark.js";
-import {drawFood, spawnFoodBurst, updateFood} from "./food.js";
-import {drawHud} from "./hud.js";
+import {Fish} from "./fish.js";
+import {Bubbles} from "./bubbles.js";
+import {Seaweed} from "./seaweed.js";
+import {Shark} from "./shark.js";
+import {Food} from "./food.js";
+import {Hud} from "./hud.js";
 import * as readline from "node:readline";
 import type {StateProps} from "./types/state.types.js";
 
 export let state: StateProps;
 export let timer: NodeJS.Timeout | null;
 export let shuttingDown = false;
+const fish: Fish = new Fish()
+const bubble: Bubbles = new Bubbles()
+const seaweed: Seaweed = new Seaweed()
+const hud: Hud = new Hud()
+const shark: Shark = new Shark()
+const food: Food = new Food()
 
 export function createState(): StateProps {
     const width = Math.max(60, process.stdout.columns || 80);
     const height = Math.max(18, process.stdout.rows || 24);
     const fishCount = Math.min(12, Math.max(6, Math.floor(width / 10)));
-
     return {
         width,
         height,
@@ -40,14 +45,14 @@ export function createState(): StateProps {
         splashMessage: "f feed  a add  r remove  l light  s shark.ts  h hud  q quit",
         splashAge: 0,
         feedingFrenzy: 0,
-        fish: Array.from({length: fishCount}, () => createFish(width, height)),
+        fish: Array.from({length: fishCount}, () => fish.createFish(width, height)),
         bubbles: Array.from({length: Math.min(24, Math.floor(width / 3))}, () =>
-            createBubble(width, height)
+            bubble.createBubble(width, height)
         ),
         foods: [],
         shark: null,
         lastRareEvent: 0,
-        seaweed: createSeaweed(width, height),
+        seaweed: seaweed.createSeaweed(width, height),
     };
 }
 
@@ -58,7 +63,7 @@ export function resizeState(nextWidth: number, nextHeight: number) {
 
     state.width = Math.max(60, nextWidth || 80);
     state.height = Math.max(18, nextHeight || 24);
-    state.seaweed = createSeaweed(state.width, state.height);
+    state.seaweed = seaweed.createSeaweed(state.width, state.height);
 
     for (const fish of state.fish) {
         fish.x = clamp(fish.x, 1, state.width - fish.shape.length - 1);
@@ -78,11 +83,11 @@ export function resizeState(nextWidth: number, nextHeight: number) {
 
 export function maybeSpawnAmbientEffects(dt: number) {
     if (Math.random() < 0.34 * dt && state.bubbles.length < MAX_BUBBLES) {
-        state.bubbles.push(createBubble(state.width, state.height));
+        state.bubbles.push(bubble.createBubble(state.width, state.height));
     }
 
     if (!state.shark && state.clock - state.lastRareEvent > 18 && Math.random() < 0.015 * dt) {
-        state.shark = createShark(state.width, state.height);
+        state.shark = shark.createShark(state.width, state.height);
         state.lastRareEvent = state.clock;
         state.splashMessage = "A shadow glides through the tank...";
         state.splashAge = 0;
@@ -99,10 +104,10 @@ export function update(dt: number) {
     }
 
     maybeSpawnAmbientEffects(dt);
-    updateFood(dt);
-    updateBubbles(dt);
-    updateFish(dt);
-    updateShark(dt);
+    food.updateFood(dt);
+    bubble.updateBubbles(dt);
+    fish.updateFish(dt);
+    shark.updateShark(dt);
 }
 
 export function getWaterTone(x: number, y: number) {
@@ -175,12 +180,12 @@ export function renderBuffer(buffer: { chars: any; colors: any; }) {
 export function render() {
     const buffer = createBuffer(state.width, state.height);
     drawBackground(buffer);
-    drawSeaweed(buffer);
-    drawFood(buffer);
-    drawBubbles(buffer);
-    drawFish(buffer);
-    drawShark(buffer);
-    drawHud(buffer);
+    seaweed.drawSeaweed(buffer);
+    food.drawFood(buffer);
+    bubble.drawBubbles(buffer);
+    fish.drawFish(buffer);
+    shark.drawShark(buffer);
+    hud.drawHud(buffer);
     renderBuffer(buffer);
 }
 
@@ -199,11 +204,11 @@ export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
             shutdown();
             break;
         case "f":
-            spawnFoodBurst();
+            food.spawnFoodBurst();
             break;
         case "a":
             if (state.fish.length < MAX_FISH) {
-                state.fish.push(createFish(state.width, state.height));
+                state.fish.push(fish.createFish(state.width, state.height));
                 state.splashMessage = "A new fish slips into the tank.";
                 state.splashAge = 0;
             }
@@ -229,13 +234,13 @@ export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
             break;
         case "s":
             if (!state.shark) {
-                state.shark = createShark(state.width, state.height);
+                state.shark = shark.createShark(state.width, state.height);
                 state.splashMessage = "A rare predator arrives.";
                 state.splashAge = 0;
             }
             break;
         case "b":
-            spawnBubbleBurst();
+            bubble.spawnBubbleBurst();
             state.splashMessage = "Bubble vent triggered.";
             state.splashAge = 0;
             break;
