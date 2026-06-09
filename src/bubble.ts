@@ -2,9 +2,10 @@ import {MAX_BUBBLES} from "./constants.js";
 import {state} from "./index.js";
 import {color, dim, writeCell, rand, pick} from "./utils.js";
 import type {BubbleProps} from "./types/bubble.types.js";
+import type {Entity} from "./interfaces/entity.interface";
 
-export class Bubble {
-    createBubble(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {
+export class Bubble implements Entity{
+    create(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {
         return {
             x: sourceX + rand(-0.5, 0.5),
             y: sourceY + rand(-0.2, 0.2),
@@ -23,11 +24,11 @@ export class Bubble {
             if (state.bubbles.length >= MAX_BUBBLES) {
                 break;
             }
-            state.bubbles.push(this.createBubble(state.width, state.height, burstX, burstY));
+            state.bubbles.push(this.create(state.width, state.height, burstX, burstY));
         }
     }
 
-    updateBubbles(dt: number) {
+    update(dt: number) {
         state.bubbles = state.bubbles.filter((bubble: BubbleProps) => {
             bubble.age += dt;
             bubble.x += bubble.vx * dt + Math.sin(state.clock * 2.4 + bubble.age * 5) * 0.03;
@@ -38,7 +39,7 @@ export class Bubble {
         });
     }
 
-    drawBubbles(buffer: { chars: any[][]; colors: any[][]; }) {
+    draw(buffer: { chars: any[][]; colors: any[][]; }) {
         for (const bubble of state.bubbles) {
             const style = bubble.glyph === "." ? dim(153) : color(159);
             writeCell(buffer, Math.round(bubble.x), Math.round(bubble.y), bubble.glyph, style);

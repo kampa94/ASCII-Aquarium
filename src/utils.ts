@@ -1,6 +1,6 @@
-import {ESC} from "./constants.js";
+import {ESC, RESET} from "./constants.js";
 import {getWaterTone, state} from "./index.js";
-import * as process from "node:process";
+import process from "node:process";
 
 export function printHelp() {
     const lines = [
@@ -131,4 +131,24 @@ export function drawBackground(buffer: { chars: any; colors: any; }) {
             writeCell(buffer, x, y, char, waterStyle);
         }
     }
+}
+
+export function renderBuffer(buffer: { chars: any; colors: any; }) {
+    let output = `${ESC}H`;
+    for (let y = 0; y < buffer.chars.length; y += 1) {
+        let currentStyle = "";
+        for (let x = 0; x < buffer.chars[y].length; x += 1) {
+            const style = buffer.colors[y][x];
+            if (style !== currentStyle) {
+                output += style;
+                currentStyle = style;
+            }
+            output += buffer.chars[y][x];
+        }
+        output += RESET;
+        if (y < buffer.chars.length - 1) {
+            output += "\n";
+        }
+    }
+    process.stdout.write(output);
 }

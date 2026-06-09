@@ -2,10 +2,14 @@ import {SEAWEED_SPACING} from "./constants.js";
 import {color, pick, rand, writeCell} from "./utils.js";
 import {state} from "./index.js";
 import type {SeaweedProps, Stalks} from "./types/seaweed.types.js";
+import type {Entity} from "./interfaces/entity.interface";
 
 
-export class Seaweed {
-    createSeaweed(width: number, height: number): SeaweedProps {
+export class Seaweed implements Entity {
+    update(): void {
+        throw new Error("Method not implemented.");
+    }
+    create(width: number, height: number): SeaweedProps {
         const stalks: Stalks[] = [];
         const floorY = Math.max(3, height - 2);
         for (let x = 4; x < width - 4; x += SEAWEED_SPACING) {
@@ -20,7 +24,7 @@ export class Seaweed {
         return {stalks, floorY};
     }
 
-    drawSeaweed(buffer: { chars: any[][]; colors: any[][]; }) {
+    draw(buffer: { chars: any[][]; colors: any[][]; }) {
         const floorY = state.seaweed.floorY;
         const style = color(34);
         for (const stalk of state.seaweed.stalks) {

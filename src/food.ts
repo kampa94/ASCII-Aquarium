@@ -2,9 +2,10 @@ import {bold, dim, rand, writeCell} from "./utils";
 import {state} from "./index";
 import {FEEDING_FRENZY_SECONDS} from "./constants";
 import type {FoodProps} from "./types/food.types.js";
+import type {Entity} from "./interfaces/entity.interface";
 
-export class Food {
-    private createFood(width: number): FoodProps {
+export class Food implements Entity{
+    create(width: number): FoodProps {
         return {
             x: rand(Math.max(4, width * 0.18), Math.max(5, width * 0.82)),
             y: 2,
@@ -17,14 +18,14 @@ export class Food {
     spawnFoodBurst() {
         const count = Math.floor(rand(3, 7));
         for (let i = 0; i < count; i += 1) {
-            state.foods.push(this.createFood(state.width));
+            state.foods.push(this.create(state.width));
         }
         state.feedingFrenzy = FEEDING_FRENZY_SECONDS;
         state.splashMessage = "Feeding frenzy! The school turns instantly.";
         state.splashAge = 0;
     }
 
-    drawFood(buffer: { chars: any[][]; colors: any[][]; }) {
+    draw(buffer: { chars: any[][]; colors: any[][]; }) {
         const style = bold(220);
         const sparkleStyle = bold(229);
 
@@ -39,7 +40,7 @@ export class Food {
         }
     }
 
-    updateFood(dt: number) {
+    update(dt: number) {
         state.foods = state.foods.filter((food: FoodProps) => {
             food.life += dt;
             food.y += food.vy * dt;

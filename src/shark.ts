@@ -3,10 +3,11 @@ import {state} from "./index.js";
 import {MAX_BUBBLES} from "./constants.js";
 import type {SharkProps} from "./types/shark.types";
 import {Bubble} from "./bubble";
+import type {Entity} from "./interfaces/entity.interface";
 
-export class Shark {
+export class Shark implements Entity{
     bubble = new Bubble()
-    createShark(width: number, height: number): SharkProps {
+    create(width: number, height: number): SharkProps {
         const dir = Math.random() > 0.5 ? 1 : -1;
         // Single-line shark.js that actually looks like a shark.js
         const body = dir === 1
@@ -23,7 +24,7 @@ export class Shark {
         };
     }
 
-    drawShark(buffer: { chars: any[][]; colors: any[][]; }) {
+    draw(buffer: { chars: any[][]; colors: any[][]; }) {
         if (!state.shark) {
             return;
         }
@@ -31,7 +32,7 @@ export class Shark {
         drawText(buffer, Math.round(state.shark.x), y, state.shark.body, bold(250));
     }
 
-    updateShark(dt: number) {
+    update(dt: number) {
         if (!state.shark) {
             return;
         }
@@ -43,7 +44,7 @@ export class Shark {
 
         if (Math.random() < 0.9 * dt && state.bubbles.length < MAX_BUBBLES) {
             state.bubbles.push(
-             this.bubble.createBubble(
+             this.bubble.create(
                     state.width,
                     state.height,
                     shark.x + (shark.dir === 1 ? shark.body.length - 6 : 5),

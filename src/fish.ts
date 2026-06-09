@@ -3,11 +3,12 @@ import {state} from "./index.js";
 import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
 import type {FishProps} from "./types/fish.types.js";
 import {Bubble} from "./bubble";
+import {type Entity} from "./interfaces/entity.interface"
 
-export class Fish {
+export class Fish implements Entity{
     bubble = new Bubble();
 
-    createFish(width: number, height: number): FishProps {
+    create(width: number, height: number): FishProps {
         let options = {
             dir: null,
             depth: null,
@@ -80,7 +81,7 @@ export class Fish {
         }
     }
 
-    drawFish(buffer: { chars: any[][]; colors: any[][]; }) {
+    draw(buffer: { chars: any[][]; colors: any[][]; }) {
         const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
         for (const fish of sorted) {
             const body = fish.dir === 1 ? fish.shape : mirrorShape(fish.shape);
@@ -95,7 +96,7 @@ export class Fish {
         }
     }
 
-    updateFish(dt: number) {
+    update(dt: number) {
         for (const fish of state.fish) {
             fish.age += dt;
             fish.hunger = clamp(fish.hunger + fish.hungerRate * dt, 0, 1.5);
