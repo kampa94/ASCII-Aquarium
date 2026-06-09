@@ -1,8 +1,9 @@
-import {bold, dim, rand, writeCell} from "./utils";
-import {state} from "./index";
-import {FEEDING_FRENZY_SECONDS} from "./constants";
-import type {FoodProps} from "./types/food.types.js";
-import type {Entity} from "./interfaces/entity.interface";
+import {bold, dim, writeCell} from "../utils/utils";
+import {state} from "@";
+import {FEEDING_FRENZY_SECONDS} from "../utils/constants";
+import type {FoodProps} from "../types/food.types";
+import type {Entity} from "../interfaces/entity.interface";
+import {rand} from "../utils/math.utils";
 
 export class Food implements Entity{
     create(width: number): FoodProps {

@@ -1,9 +1,10 @@
-import {bold, clamp, color, dim, drawText, limitMagnitude, mirrorShape, pick, rand} from "./utils.js";
-import {state} from "./index.js";
-import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
-import type {FishProps} from "./types/fish.types.js";
+import {bold, color, dim, drawText, mirrorShape} from "../utils/utils";
+import {state} from "@";
+import {RIGHT_SHAPES, PERSONALITIES} from "../utils/constants"
+import type {FishProps} from "../types/fish.types";
 import {Bubble} from "./bubble";
-import {type Entity} from "./interfaces/entity.interface"
+import {type Entity} from "../interfaces/entity.interface"
+import {clamp, limitMagnitude, pick, rand} from "../utils/math.utils";
 
 export class Fish implements Entity{
     bubble = new Bubble();

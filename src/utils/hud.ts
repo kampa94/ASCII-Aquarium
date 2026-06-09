@@ -1,6 +1,6 @@
-import {state} from "./index.js";
-import {ESC, LIGHTING_MODES} from "./constants.js";
-import {drawText} from "./utils.js";
+import {state} from "@";
+import {ESC, LIGHTING_MODES} from "./constants";
+import {drawText} from "./utils";
 
 export class Hud {
     drawHud(buffer: { chars: any[][]; colors: any[][]; }) {

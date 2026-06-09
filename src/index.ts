@@ -2,25 +2,24 @@
 
 import process from "node:process";
 import {
-    clamp,
     drawBackground,
     enterAltScreen,
     hideCursor,
     leaveAltScreen,
     printHelp,
-    rand,
     renderBuffer,
     showCursor
-} from "./utils.js";
-import {FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./constants.js";
-import {Fish} from "./fish.js";
-import {Bubble} from "./bubble";
-import {Seaweed} from "./seaweed.js";
-import {Shark} from "./shark.js";
-import {Food} from "./food.js";
-import {Hud} from "./hud.js";
+} from "./utils/utils";
+import {FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./utils/constants";
+import {Fish} from "./entities/fish";
+import {Bubble} from "./entities/bubble";
+import {Seaweed} from "./entities/seaweed";
+import {Shark} from "./entities/shark";
+import {Food} from "./entities/food";
+import {Hud} from "./utils/hud";
 import * as readline from "node:readline";
 import type {StateProps} from "./types/state.types.js";
+import {clamp, rand} from "./utils/math.utils";
 
 export let state: StateProps;
 export let timer: NodeJS.Timeout | null;
