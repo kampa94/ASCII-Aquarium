@@ -4,8 +4,8 @@ import {state} from "./index.js";
 import type {Seaweed, Stalks} from "./types/seaweed.types.js";
 
 
-export function createSeaweed(width: number, height: number):Seaweed {
-    const stalks:Stalks[] = [];
+export function createSeaweed(width: number, height: number): Seaweed {
+    const stalks: Stalks[] = [];
     const floorY = Math.max(3, height - 2);
     for (let x = 4; x < width - 4; x += SEAWEED_SPACING) {
         stalks.push({
@@ -16,9 +16,8 @@ export function createSeaweed(width: number, height: number):Seaweed {
             glyph: pick(["|", "/", "\\"]),
         });
     }
-    return { stalks, floorY };
+    return {stalks, floorY};
 }
-
 
 export function drawSeaweed(buffer: { chars: any[][]; colors: any[][]; }) {
     const floorY = state.seaweed.floorY;

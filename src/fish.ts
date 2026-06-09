@@ -4,12 +4,13 @@ import {RIGHT_SHAPES, PERSONALITIES} from "./constants.js"
 import {spawnBubbleBurst} from "./bubbles.js";
 import type {Fish} from "./types/fish.types.js";
 
-export function createFish(width: number, height: number, options: {
-    dir: number;
-    depth: any;
-    x: any;
-    y: any;
-} | undefined): Fish {
+export function createFish(width: number, height: number): Fish {
+    let options = {
+        dir: null,
+        depth: null,
+        x: null,
+        y: null
+    }
     const shape = pick(RIGHT_SHAPES);
     const dir = options?.dir || (Math.random() > 0.5 ? 1 : -1);
     const personality = pick(PERSONALITIES);
@@ -23,7 +24,7 @@ export function createFish(width: number, height: number, options: {
 
     return {
         width: width,
-        height:height,
+        height: height,
         x: options?.x ?? rand(2, Math.max(3, width - shape.length - 2)),
         y: options?.y ?? rand(2, Math.max(4, height - 4)),
         vx: dir * speedBase,

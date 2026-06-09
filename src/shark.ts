@@ -21,7 +21,6 @@ export function createShark(width: number, height: number): Shark {
         phase: rand(0, Math.PI * 2),
     };
 }
-
 export function drawShark(buffer: { chars: any[][]; colors: any[][]; }) {
     if (!state.shark) {
         return;
@@ -29,7 +28,6 @@ export function drawShark(buffer: { chars: any[][]; colors: any[][]; }) {
     const y = Math.round(state.shark.y + Math.sin(state.shark.phase) * 0.6);
     drawText(buffer, Math.round(state.shark.x), y, state.shark.body, bold(250));
 }
-
 export function updateShark(dt: number) {
     if (!state.shark) {
         return;

@@ -40,7 +40,7 @@ export function createState(): State {
         splashMessage: "f feed  a add  r remove  l light  s shark.ts  h hud  q quit",
         splashAge: 0,
         feedingFrenzy: 0,
-        fish: Array.from({length: fishCount}, () => createFish(width, height, undefined)),
+        fish: Array.from({length: fishCount}, () => createFish(width, height)),
         bubbles: Array.from({length: Math.min(24, Math.floor(width / 3))}, () =>
             createBubble(width, height)
         ),
@@ -203,7 +203,7 @@ export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
             break;
         case "a":
             if (state.fish.length < MAX_FISH) {
-                state.fish.push(createFish(state.width, state.height, undefined));
+                state.fish.push(createFish(state.width, state.height));
                 state.splashMessage = "A new fish slips into the tank.";
                 state.splashAge = 0;
             }
