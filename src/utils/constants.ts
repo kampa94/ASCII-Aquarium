@@ -6,7 +6,6 @@ export enum LIGHTING_MODES {
 };
 export const SEAWEED_SPACING = 8;
 
-
 export const FPS = 30;
 export const FRAME_MS = 1000 / FPS;
 export const MAX_FISH = 28;
@@ -16,10 +15,10 @@ export const RESET = "\x1b[0m";
 export const FEEDING_FRENZY_SECONDS = 6.5;
 
 export enum PERSONALITIES {
-    "social",
-    "curious",
-    "lazy",
-    "darty"
+    social,
+    curious,
+    lazy,
+    darty
 }
 
 export const RIGHT_SHAPES = [
