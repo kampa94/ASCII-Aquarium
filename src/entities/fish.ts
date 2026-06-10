@@ -116,137 +116,211 @@ export class Fish implements Entity {
 
     update(dt: number) {
         for (const fish of state.fish) {
-            fish.age += dt;
-            fish.hunger = clamp(fish.hunger + fish.hungerRate * dt, 0, 1.5);
+            this.updateBiologicalState(fish, dt);
 
-            let alignX = 0;
-            let alignY = 0;
-            let cohesionX = 0;
-            let cohesionY = 0;
-            let separationX = 0;
-            let separationY = 0;
-            let neighbors = 0;
+            const steer = {
+                x: 0,
+                y: Math.sin(state.clock * 1.2 + fish.phase) * 0.6
+            };
 
-            for (const other of state.fish) {
-                if (other === fish) {
-                    continue;
-                }
-                const dx = other.x - fish.x;
-                const dy = other.y - fish.y;
-                const distance = Math.hypot(dx, dy);
+            this.applyFlockingForces(fish, steer);
+            this.applyMovementForces(fish, steer, dt);
+            this.applyAvoidanceForces(fish, steer);
 
-                if (distance < 14) {
-                    neighbors += 1;
-                    alignX += fish.vx ?? 0;
-                    alignY += other.vy ?? 0;
-                    cohesionX += other.x;
-                    cohesionY += other.y;
-                }
+            this.updateVelocity(fish, steer, dt);
+            this.updatePosition(fish, dt);
 
-                if (distance > 0 && distance < 4) {
-                    separationX -= dx / distance;
-                    separationY -= dy / distance;
-                }
-            }
-
-            let steerX = 0;
-            let steerY = Math.sin(state.clock * 1.2 + fish.phase) * 0.6;
-
-            if (neighbors > 0 && fish.personality !== PERSONALITIES.lazy) {
-                // todo: extract logic
-                alignX = alignX / neighbors - (fish.vx ?? 0);
-                alignY = alignY / neighbors - (fish.vy ?? 0);
-                cohesionX = cohesionX / neighbors - fish.x;
-                cohesionY = cohesionY / neighbors - fish.y;
-                steerX += alignX * 0.012 + cohesionX * 0.01 + separationX * 0.85;
-                steerY += alignY * 0.012 + cohesionY * 0.01 + separationY * 0.85;
-            }
-
-            const nearestFood = this.findNearestFood(fish);
-
-            // todo: simplify
-            if (nearestFood && (state.feedingFrenzy > 0 || fish.hunger > 0.18)) {
-                const dx = nearestFood.x - fish.x;
-                const dy = nearestFood.y - fish.y;
-                const dist = Math.max(1, Math.hypot(dx, dy));
-                const pull = (state.feedingFrenzy > 0 ? 2.1 : 1) * (1 / dist) * (1 + fish.hunger * 0.85);
-                steerX += dx * 3.6 * pull;
-                steerY += dy * 3.1 * pull;
-            } else {
-                fish.wanderX += rand(-0.18, 0.18) * dt;
-                fish.wanderY += rand(-0.12, 0.12) * dt;
-                fish.wanderX = clamp(fish.wanderX, -1.3, 1.3);
-                fish.wanderY = clamp(fish.wanderY, -0.9, 0.9);
-                steerX += fish.wanderX * 0.9;
-                steerY += fish.wanderY * 0.4;
-            }
-
-            // todo: extract logic
-            const leftMargin = 2;
-            const rightMargin = state.width - fish.shape.length - 2;
-            const topMargin = 2;
-            const bottomMargin = state.height - 3;
-
-            if (fish.x < leftMargin + 4) {
-                steerX += (leftMargin + 4 - fish.x) * 0.32;
-            }
-            if (fish.x > rightMargin - 4) {
-                steerX -= (fish.x - (rightMargin - 4)) * 0.32;
-            }
-            if (fish.y < topMargin + 1) {
-                steerY += 1.2;
-            }
-            if (fish.y > bottomMargin - 1) {
-                steerY -= 1.2;
-            }
-
-            if (state.shark) {
-                // todo: extract logic
-                const dx = fish.x - state.shark.x;
-                const dy = fish.y - state.shark.y;
-                const distance = Math.hypot(dx, dy);
-                if (distance < 18) {
-                    steerX += (dx / Math.max(distance, 1)) * 20;
-                    steerY += (dy / Math.max(distance, 1)) * 12;
-                }
-            }
-
-            const hungerBoost = 1 + fish.hunger * 0.5;
-            fish.vx = (fish.vx ?? 0) + steerX * dt * hungerBoost;
-            fish.vy = (fish.vy ?? 0) + steerY * dt;
-
-            const maxSpeed =
-                fish.speedBase *
-                (fish.personality ===  PERSONALITIES.darty ? 1.35 : fish.personality === PERSONALITIES.lazy ? 0.85 : 1) *
-                (0.92 + fish.depth * 0.5);
-
-            [fish.vx, fish.vy] = limitMagnitude((fish.vx ?? 0), fish.vy, maxSpeed);
-
-            fish.x += (fish.vx ?? 0) * dt;
-            fish.y += (fish.vy ?? 0) * dt;
-
-            // todo: extract logic and simplify
-            if (fish.x <= 1) {
-                fish.x = 1;
-                fish.vx = Math.abs((fish.vx ?? 0));
-            }
-            if (fish.x >= state.width - fish.shape.length - 1) {
-                fish.x = state.width - fish.shape.length - 1;
-                fish.vx = -Math.abs((fish.vx ?? 0));
-            }
-            if (fish.y <= 2) {
-                fish.y = 2;
-                fish.vy = Math.abs((fish.vy ?? 0)) * 0.5;
-            }
-            if (fish.y >= state.height - 3) {
-                fish.y = state.height - 3;
-                fish.vy = -Math.abs((fish.vy ?? 0)) * 0.5;
-            }
-
-            fish.dir = (fish.vx ?? 0) >= 0 ? 1 : -1;
-            this.eatNearbyFood(fish);
+            this.constrainToMap(fish);
+            this.finalizeTurn(fish, dt);
         }
     }
+
+    private updateBiologicalState(fish: any, dt: number): void {
+        fish.age += dt;
+        fish.hunger = clamp(fish.hunger + fish.hungerRate * dt, 0, 1.5);
+    }
+
+    private applyFlockingForces(fish: any, steer: { x: number; y: number }): void {
+        const flocking = this.calculateFlocking(fish);
+        steer.x += flocking.x;
+        steer.y += flocking.y;
+    }
+
+    private applyMovementForces(fish: any, steer: { x: number; y: number }, dt: number): void {
+        const movement = this.calculateMovement(fish, dt);
+        steer.x += movement.x;
+        steer.y += movement.y;
+    }
+
+    private applyAvoidanceForces(fish: any, steer: { x: number; y: number }): void {
+        const avoidance = this.calculateAvoidance(fish);
+        steer.x += avoidance.x;
+        steer.y += avoidance.y;
+    }
+
+    private updateVelocity(fish: any, steer: { x: number; y: number }, dt: number): void {
+        const hungerBoost = 1 + fish.hunger * 0.5;
+        fish.vx = (fish.vx ?? 0) + steer.x * dt * hungerBoost;
+        fish.vy = (fish.vy ?? 0) + steer.y * dt;
+
+        const maxSpeed = this.getMaxSpeed(fish);
+        [fish.vx, fish.vy] = limitMagnitude(fish.vx, fish.vy, maxSpeed);
+    }
+
+    private updatePosition(fish: any, dt: number): void {
+        fish.x += (fish.vx ?? 0) * dt;
+        fish.y += (fish.vy ?? 0) * dt;
+    }
+
+    private finalizeTurn(fish: any, dt: number): void {
+        fish.dir = (fish.vx ?? 0) * dt >= 0 ? 1 : -1;
+        this.eatNearbyFood(fish);
+    }
+
+    private calculateFlocking(fish: any): { x: number; y: number } {
+        if (fish.personality === PERSONALITIES.lazy) return {x: 0, y: 0};
+        const context = {
+            alignX: 0, alignY: 0,
+            cohesionX: 0, cohesionY: 0,
+            separationX: 0, separationY: 0,
+            neighbors: 0
+        };
+
+        this.accumulateNeighborForces(fish, context);
+
+        if (context.neighbors === 0) return {x: 0, y: 0};
+
+        const steer = {x: 0, y: 0};
+        this.computeFlockingAverages(fish, context, steer);
+
+        return steer;
+    }
+
+    private accumulateNeighborForces(fish: any, context: any): void {
+        for (const other of state.fish) {
+            if (other === fish) continue;
+
+            const dx = other.x - fish.x;
+            const dy = other.y - fish.y;
+            const distance = Math.hypot(dx, dy);
+
+            if (distance < 14) {
+                context.neighbors++;
+                context.alignX += other.vx ?? 0;
+                context.alignY += other.vy ?? 0;
+                context.cohesionX += other.x;
+                context.cohesionY += other.y;
+            }
+
+            if (distance > 0 && distance < 4) {
+                context.separationX -= dx / distance;
+                context.separationY -= dy / distance;
+            }
+        }
+    }
+
+    private computeFlockingAverages(fish: any, context: any, steer: { x: number; y: number }): void {
+        const n = context.neighbors;
+
+        const alignX = context.alignX / n - (fish.vx ?? 0);
+        const alignY = context.alignY / n - (fish.vy ?? 0);
+        const cohesionX = context.cohesionX / n - fish.x;
+        const cohesionY = context.cohesionY / n - fish.y;
+
+        steer.x = alignX * 0.012 + cohesionX * 0.01 + context.separationX * 0.85;
+        steer.y = alignY * 0.012 + cohesionY * 0.01 + context.separationY * 0.85;
+    }
+
+
+    private calculateMovement(fish: any, dt: number): { x: number; y: number } {
+        const nearestFood = this.findNearestFood(fish);
+        const isFrenzy = state.feedingFrenzy > 0;
+
+        if (nearestFood && (isFrenzy || fish.hunger > 0.18)) {
+            const dx = nearestFood.x - fish.x;
+            const dy = nearestFood.y - fish.y;
+            const dist = Math.max(1, Math.hypot(dx, dy));
+
+            const pull = (isFrenzy ? 2.1 : 1) * (1 / dist) * (1 + fish.hunger * 0.85);
+            return {x: dx * 3.6 * pull, y: dy * 3.1 * pull};
+        }
+
+        fish.wanderX = clamp(fish.wanderX + rand(-0.18, 0.18) * dt, -1.3, 1.3);
+        fish.wanderY = clamp(fish.wanderY + rand(-0.12, 0.12) * dt, -0.9, 0.9);
+
+        return {x: fish.wanderX * 0.9, y: fish.wanderY * 0.4};
+    }
+
+    private calculateAvoidance(fish: any): { x: number; y: number } {
+        const steer = {x: 0, y: 0};
+
+        this.avoidScreenMargins(fish, steer);
+        this.fleeFromShark(fish, steer);
+
+        return steer;
+    }
+
+    private avoidScreenMargins(fish: any, steer: { x: number; y: number }): void {
+        const rightMargin = state.width - fish.shape.length - 2;
+
+        if (fish.x < 6) {
+            steer.x += (6 - fish.x) * 0.32;
+        }
+        if (fish.x > rightMargin - 4) {
+            steer.x -= (fish.x - (rightMargin - 4)) * 0.32;
+        }
+        if (fish.y < 3) {
+            steer.y += 1.2;
+        }
+        if (fish.y > state.height - 4) {
+            steer.y -= 1.2;
+        }
+    }
+
+    private fleeFromShark(fish: any, steer: { x: number; y: number }): void {
+        if (!state.shark) return;
+
+        const dx = fish.x - state.shark.x;
+        const dy = fish.y - state.shark.y;
+        const distance = Math.hypot(dx, dy);
+
+        if (distance < 18) {
+            const force = Math.max(distance, 1);
+            steer.x += (dx / force) * 20;
+            steer.y += (dy / force) * 12;
+        }
+    }
+
+    private getMaxSpeed(fish: any): number {
+        const personalityModifier =
+            fish.personality === PERSONALITIES.darty ? 1.35 :
+                fish.personality === PERSONALITIES.lazy ? 0.85 : 1;
+
+        return fish.speedBase * personalityModifier * (0.92 + fish.depth * 0.5);
+    }
+
+    private constrainToMap(fish: any) {
+        const rightBound = state.width - fish.shape.length - 1;
+        const bottomBound = state.height - 3;
+
+        if (fish.x <= 1) {
+            fish.x = 1;
+            fish.vx = Math.abs(fish.vx);
+        }
+        if (fish.x >= rightBound) {
+            fish.x = rightBound;
+            fish.vx = -Math.abs(fish.vx);
+        }
+        if (fish.y <= 2) {
+            fish.y = 2;
+            fish.vy = Math.abs(fish.vy) * 0.5;
+        }
+        if (fish.y >= bottomBound) {
+            fish.y = bottomBound;
+            fish.vy = -Math.abs(fish.vy) * 0.5;
+        }
+    }
+
 
     mirrorShape(shape: string) {
         const pairs: Record<string, string> = {
