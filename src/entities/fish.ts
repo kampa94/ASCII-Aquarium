@@ -103,8 +103,12 @@ export class Fish implements Entity {
         const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
         for (const fish of sorted) {
             const body = fish.dir === 1 ? fish.shape : this.mirrorShape(fish.shape);
-            // todo: simplify
-            const style = fish.depth > 0.66 ? bold(fish.color) : fish.depth > 0.38 ? color(fish.color) : dim(fish.color);
+            let style = dim(fish.color);
+            if (fish.depth > 0.66) {
+                style = bold(fish.color);
+            } else if (fish.depth > 0.38) {
+                style = color(fish.color);
+            }
             const y = Math.round(fish.y + Math.sin(state.clock * 2 + fish.phase) * 0.35);
             drawText(buffer, Math.round(fish.x), y, body, style);
         }
