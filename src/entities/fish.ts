@@ -21,16 +21,28 @@ export class Fish implements Entity {
         }
         const shape = pick(RIGHT_SHAPES);
         const dir = options?.dir || (Math.random() > 0.5 ? 1 : -1);
-        const personality = pick(PERSONALITIES);
+        const personality: PERSONALITIES = pick(PERSONALITIES);
         const depth = options?.depth ?? rand(0.15, 1);
+        let speedBase = 0;
 
-        // todo: refactor
-        const speedBase =
-            personality === "darty"
-                ? rand(10, 18)
-                : personality === "lazy"
-                    ? rand(5, 8.5)
-                    : rand(7.5, 12.5);
+        switch (personality) {
+            case PERSONALITIES.darty:
+                speedBase = rand(10, 18);
+                break;
+            case PERSONALITIES.lazy:
+                speedBase = rand(5, 8.5);
+                break;
+            case PERSONALITIES.social:
+                speedBase = rand(7.5, 12.5);
+                break;
+            case PERSONALITIES.curious:
+                speedBase = rand(10, 15);
+                break;
+            default:
+                // DEFAULT: social
+                speedBase = rand(7.5, 12.5);
+                break;
+        }
 
         return {
             width: width,
@@ -136,7 +148,7 @@ export class Fish implements Entity {
             let steerX = 0;
             let steerY = Math.sin(state.clock * 1.2 + fish.phase) * 0.6;
 
-            if (neighbors > 0 && fish.personality !== "lazy") {
+            if (neighbors > 0 && fish.personality !== PERSONALITIES.lazy) {
                 // todo: extract logic
                 alignX = alignX / neighbors - (fish.vx ?? 0);
                 alignY = alignY / neighbors - (fish.vy ?? 0);
@@ -201,7 +213,7 @@ export class Fish implements Entity {
 
             const maxSpeed =
                 fish.speedBase *
-                (fish.personality === "darty" ? 1.35 : fish.personality === "lazy" ? 0.85 : 1) *
+                (fish.personality ===  PERSONALITIES.darty ? 1.35 : fish.personality === PERSONALITIES.lazy ? 0.85 : 1) *
                 (0.92 + fish.depth * 0.5);
 
             [fish.vx, fish.vy] = limitMagnitude((fish.vx ?? 0), fish.vy, maxSpeed);

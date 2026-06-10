@@ -1,3 +1,5 @@
+import type {PERSONALITIES} from "../utils/constants";
+
 export type FishProps =  {
     width: number,
     height: number,
@@ -9,7 +11,7 @@ export type FishProps =  {
     shape: string
     // todo: change to boolean, rename
     dir: number,
-    personality: string
+    personality: PERSONALITIES
     speedBase: number
     hungerRate: number
     color: number

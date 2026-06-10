@@ -15,7 +15,12 @@ export const ESC = "\x1b[";
 export const RESET = "\x1b[0m";
 export const FEEDING_FRENZY_SECONDS = 6.5;
 
-export const PERSONALITIES = ["social", "curious", "lazy", "darty"];
+export enum PERSONALITIES {
+    "social",
+    "curious",
+    "lazy",
+    "darty"
+}
 
 export const RIGHT_SHAPES = [
     "><>",
