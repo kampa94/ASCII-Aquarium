@@ -4,7 +4,7 @@ import process from "node:process";
 import {
     printHelp
 } from "./utils/utils";
-import {FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./utils/constants";
+import {FRAME_MS, MAX_BUBBLES, MAX_FISH, RESET} from "./utils/constants";
 import {Fish} from "./entities/fish";
 import {Bubble} from "./entities/bubble";
 import {Seaweed} from "./entities/seaweed";
@@ -16,6 +16,7 @@ import type {StateProps} from "./types/state.types.js";
 import {clamp, rand} from "./utils/math.utils";
 import {enterAltScreen, hideCursor, leaveAltScreen, showCursor} from "./utils/appearance.utils";
 import {drawBackground, renderBuffer} from "./utils/render.utils";
+import {LIGHTING_MODES} from "./enums/enums";
 
 export let state: StateProps;
 export let timer: NodeJS.Timeout | null;

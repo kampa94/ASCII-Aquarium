@@ -1,5 +1,4 @@
 import {state} from "@";
-import {PERSONALITIES, RIGHT_SHAPES} from "../utils/constants"
 import type {FishProps} from "../types/fish.types";
 import {Bubble} from "./bubble";
 import {type Entity} from "../interfaces/entity.interface"
@@ -7,6 +6,7 @@ import {clamp, limitMagnitude, pick, rand} from "../utils/math.utils";
 import {bold, color, dim} from "../utils/appearance.utils";
 
 import {drawText} from "../utils/render.utils";
+import {PERSONALITIES, RIGHT_SHAPES} from "../enums/enums";
 
 
 export class Fish implements Entity {

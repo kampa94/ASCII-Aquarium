@@ -3,7 +3,8 @@ import type {BubbleProps} from "./bubble.types.js";
 import type {FoodProps} from "./food.types.js";
 import type {SharkProps} from "./shark.types.js";
 import type {SeaweedProps} from "./seaweed.types.js";
-import type {LIGHTING_MODES} from "../utils/constants";
+
+import {LIGHTING_MODES} from "../enums/enums";
 
 export type StateProps =  {
     width: number;

@@ -1,8 +1,9 @@
 import {state} from "@";
-import {ESC, LIGHTING_MODES} from "./constants";
+import {ESC} from "./constants";
 
 
 import {drawText} from "./render.utils";
+import {LIGHTING_MODES} from "../enums/enums";
 
 export class Hud {
     drawHud(buffer: { chars: any[][]; colors: any[][]; }) {

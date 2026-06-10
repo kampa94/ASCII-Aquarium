@@ -1,4 +1,4 @@
-import type {PERSONALITIES} from "../utils/constants";
+import {PERSONALITIES} from "../enums/enums";
 
 export type FishProps =  {
     width: number,
