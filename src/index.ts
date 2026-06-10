@@ -199,19 +199,14 @@ export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
                 state.splashAge = 0;
             }
             break;
-        case "l":
-            // todo: simplify
-            state.lightingMode =
-                state.lightingMode === LIGHTING_MODES.AUTO
-                    ? LIGHTING_MODES.NIGHT
-                    : state.lightingMode === LIGHTING_MODES.NIGHT
-                        ? LIGHTING_MODES.NEON
-                        : state.lightingMode === LIGHTING_MODES.NEON
-                            ? LIGHTING_MODES.ABYSS
-                            : LIGHTING_MODES.AUTO;
+        case "l": {
+            const currentIndex = state.lightingMode;
+            const nextIndex = (currentIndex + 1) % Object.keys(LIGHTING_MODES).length;
+            state.lightingMode = Object.values(LIGHTING_MODES)[nextIndex] as LIGHTING_MODES;
             state.splashMessage = `Lighting: ${state.lightingMode}`;
             state.splashAge = 0;
             break;
+        }
         case "s":
             if (!state.shark) {
                 state.shark = shark.create(state.width, state.height);
