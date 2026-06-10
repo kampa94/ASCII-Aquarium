@@ -9,8 +9,7 @@ export type FishProps =  {
     x:number
     y:number
     shape: string
-    // todo: change to boolean, rename
-    dir: number,
+    rightDirection: boolean,
     personality: PERSONALITIES
     speedBase: number
     hungerRate: number

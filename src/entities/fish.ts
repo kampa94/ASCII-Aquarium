@@ -14,13 +14,13 @@ export class Fish implements Entity {
 
     create(width: number, height: number): FishProps {
         let options = {
-            dir: null,
+            dir: true,
             depth: null,
             x: null,
             y: null
         }
         const shape = pick(RIGHT_SHAPES);
-        const dir = options?.dir || (Math.random() > 0.5 ? 1 : -1);
+        const dir = options?.dir || (Math.random() > 0.5);
         const personality: PERSONALITIES = pick(PERSONALITIES);
         const depth = options?.depth ?? rand(0.15, 1);
         let speedBase = 0;
@@ -49,9 +49,9 @@ export class Fish implements Entity {
             height: height,
             x: options?.x ?? rand(2, Math.max(3, width - shape.length - 2)),
             y: options?.y ?? rand(2, Math.max(4, height - 4)),
-            vx: dir * speedBase,
+            vx: (dir ? 1 : -1) * speedBase,
             vy: rand(-2.4, 2.4),
-            dir,
+            rightDirection: dir,
             shape,
             personality,
             speedBase,
@@ -102,7 +102,7 @@ export class Fish implements Entity {
     draw(buffer: { chars: any[][]; colors: any[][]; }) {
         const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
         for (const fish of sorted) {
-            const body = fish.dir === 1 ? fish.shape : this.mirrorShape(fish.shape);
+            const body = fish.rightDirection ? fish.shape : this.mirrorShape(fish.shape);
             let style = dim(fish.color);
             if (fish.depth > 0.66) {
                 style = bold(fish.color);
