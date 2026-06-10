@@ -8,19 +8,20 @@ import {bold} from "../utils/appearance.utils";
 
 import {drawText} from "../utils/render.utils";
 
-export class Shark implements Entity{
+export class Shark implements Entity {
     bubble = new Bubble()
+
     create(width: number, height: number): SharkProps {
-        const dir = Math.random() > 0.5 ? 1 : -1;
+        const dir = Math.random() > 0.5;
         // Single-line shark.js that actually looks like a shark.js
-        const body = dir === 1
+        const body = dir
             ? "    /\\    ___)))>=======>"
             : "<=======(((___    /\\    ";
         return {
-            x: dir === 1 ? -body.length : width + body.length,
+            x: dir ? -body.length : width + body.length,
             y: rand(3, Math.max(5, height * 0.55)),
-            vx: dir * rand(16, 20),
-            dir,
+            vx: rand(16, 20) * (dir ? 1 : -1),
+            rightDirection: dir,
             body,
             ttl: 14,
             phase: rand(0, Math.PI * 2),
@@ -47,10 +48,10 @@ export class Shark implements Entity{
 
         if (Math.random() < 0.9 * dt && state.bubbles.length < MAX_BUBBLES) {
             state.bubbles.push(
-             this.bubble.create(
+                this.bubble.create(
                     state.width,
                     state.height,
-                    shark.x + (shark.dir === 1 ? shark.body.length - 6 : 5),
+                    shark.x + (shark.rightDirection ? shark.body.length - 6 : 5),
                     shark.y + 1
                 )
             );

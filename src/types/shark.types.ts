@@ -2,8 +2,7 @@ export type SharkProps = {
     x: number;
     y: number;
     vx: number;
-    // todo: dir deve esssere boolean
-    dir: number;
+    rightDirection: boolean;
     body: string;
     ttl: number;
     phase: number;
