@@ -35,6 +35,8 @@ export class Seaweed implements Entity {
                 const sway = Math.sin(state.clock * stalk.speed + stalk.phase + i * 0.45) * 1.3;
                 const x = Math.round(stalk.x + sway);
                 const y = floorY - i;
+
+                // todo: simplify
                 const glyph =
                     i === stalk.height - 1
                         ? pick(["'", "`", "."])

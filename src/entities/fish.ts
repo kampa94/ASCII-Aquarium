@@ -9,7 +9,7 @@ import {bold, color, dim} from "../utils/appearance.utils";
 import {drawText} from "../utils/render.utils";
 
 
-export class Fish implements Entity{
+export class Fish implements Entity {
     bubble = new Bubble();
 
     create(width: number, height: number): FishProps {
@@ -23,6 +23,8 @@ export class Fish implements Entity{
         const dir = options?.dir || (Math.random() > 0.5 ? 1 : -1);
         const personality = pick(PERSONALITIES);
         const depth = options?.depth ?? rand(0.15, 1);
+
+        // todo: refactor
         const speedBase =
             personality === "darty"
                 ? rand(10, 18)
@@ -89,12 +91,8 @@ export class Fish implements Entity{
         const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
         for (const fish of sorted) {
             const body = fish.dir === 1 ? fish.shape : this.mirrorShape(fish.shape);
-            const style =
-                fish.depth > 0.66
-                    ? bold(fish.color)
-                    : fish.depth > 0.38
-                        ? color(fish.color)
-                        : dim(fish.color);
+            // todo: simplify
+            const style = fish.depth > 0.66 ? bold(fish.color) : fish.depth > 0.38 ? color(fish.color) : dim(fish.color);
             const y = Math.round(fish.y + Math.sin(state.clock * 2 + fish.phase) * 0.35);
             drawText(buffer, Math.round(fish.x), y, body, style);
         }
@@ -139,6 +137,7 @@ export class Fish implements Entity{
             let steerY = Math.sin(state.clock * 1.2 + fish.phase) * 0.6;
 
             if (neighbors > 0 && fish.personality !== "lazy") {
+                // todo: extract logic
                 alignX = alignX / neighbors - (fish.vx ?? 0);
                 alignY = alignY / neighbors - (fish.vy ?? 0);
                 cohesionX = cohesionX / neighbors - fish.x;
@@ -148,6 +147,8 @@ export class Fish implements Entity{
             }
 
             const nearestFood = this.findNearestFood(fish);
+
+            // todo: simplify
             if (nearestFood && (state.feedingFrenzy > 0 || fish.hunger > 0.18)) {
                 const dx = nearestFood.x - fish.x;
                 const dy = nearestFood.y - fish.y;
@@ -164,6 +165,7 @@ export class Fish implements Entity{
                 steerY += fish.wanderY * 0.4;
             }
 
+            // todo: extract logic
             const leftMargin = 2;
             const rightMargin = state.width - fish.shape.length - 2;
             const topMargin = 2;
@@ -183,6 +185,7 @@ export class Fish implements Entity{
             }
 
             if (state.shark) {
+                // todo: extract logic
                 const dx = fish.x - state.shark.x;
                 const dy = fish.y - state.shark.y;
                 const distance = Math.hypot(dx, dy);
@@ -206,6 +209,7 @@ export class Fish implements Entity{
             fish.x += (fish.vx ?? 0) * dt;
             fish.y += (fish.vy ?? 0) * dt;
 
+            // todo: extract logic and simplify
             if (fish.x <= 1) {
                 fish.x = 1;
                 fish.vx = Math.abs((fish.vx ?? 0));
@@ -227,6 +231,7 @@ export class Fish implements Entity{
             this.eatNearbyFood(fish);
         }
     }
+
     mirrorShape(shape: string) {
         const pairs: Record<string, string> = {
             "<": ">",

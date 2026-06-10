@@ -114,6 +114,8 @@ export function getWaterTone(x: number, y: number) {
         Math.sin((x + y) * 0.03 + state.clock * 0.9) * 0.12;
 
     const autoDaylight = (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2;
+
+    // todo: simplify
     const daylight =
         state.lightingMode === LIGHTING_MODES.AUTO
             ? autoDaylight
@@ -197,6 +199,7 @@ export function onKeypress(_: any, key: { ctrl: any; name: string; }) {
             }
             break;
         case "l":
+            // todo: simplify
             state.lightingMode =
                 state.lightingMode === LIGHTING_MODES.AUTO
                     ? LIGHTING_MODES.NIGHT

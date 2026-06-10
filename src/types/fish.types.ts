@@ -7,6 +7,7 @@ export type FishProps =  {
     x:number
     y:number
     shape: string
+    // todo: change to boolean, rename
     dir: number,
     personality: string
     speedBase: number

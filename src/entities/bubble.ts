@@ -7,7 +7,7 @@ import {color, dim} from "../utils/appearance.utils";
 
 import {writeCell} from "../utils/render.utils";
 
-export class Bubble implements Entity{
+export class Bubble implements Entity {
     create(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {
         return {
             x: sourceX + rand(-0.5, 0.5),
@@ -45,8 +45,7 @@ export class Bubble implements Entity{
     draw(buffer: { chars: any[][]; colors: any[][]; }) {
         for (const bubble of state.bubbles) {
             const style = bubble.glyph === "." ? dim(153) : color(159);
-            writeCell(buffer, Math.round(bubble.x), Math.round(bubble.y), bubble.glyph, style);
-
+            writeCell(buffer, Math.round(bubble.x), Math.round(bubble.y), bubble.glyph, style)
         }
     }
 }
