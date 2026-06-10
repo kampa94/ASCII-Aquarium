@@ -1,9 +1,11 @@
 import {SEAWEED_SPACING} from "../utils/constants";
-import {color, writeCell} from "../utils/utils";
 import {state} from "@";
 import type {SeaweedProps, Stalks} from "../types/seaweed.types";
 import type {Entity} from "../interfaces/entity.interface";
 import {pick, rand} from "../utils/math.utils";
+import {color} from "../utils/appearance.utils";
+
+import {writeCell} from "../utils/render.utils";
 
 
 export class Seaweed implements Entity {

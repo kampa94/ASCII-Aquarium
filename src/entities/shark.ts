@@ -1,10 +1,12 @@
-import {bold, drawText} from "../utils/utils";
 import {state} from "@";
 import {MAX_BUBBLES} from "../utils/constants";
 import type {SharkProps} from "../types/shark.types";
 import {Bubble} from "./bubble";
 import type {Entity} from "../interfaces/entity.interface";
 import {rand} from "../utils/math.utils";
+import {bold} from "../utils/appearance.utils";
+
+import {drawText} from "../utils/render.utils";
 
 export class Shark implements Entity{
     bubble = new Bubble()

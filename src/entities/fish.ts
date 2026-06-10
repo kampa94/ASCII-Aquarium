@@ -1,10 +1,13 @@
-import {bold, color, dim, drawText, mirrorShape} from "../utils/utils";
 import {state} from "@";
-import {RIGHT_SHAPES, PERSONALITIES} from "../utils/constants"
+import {PERSONALITIES, RIGHT_SHAPES} from "../utils/constants"
 import type {FishProps} from "../types/fish.types";
 import {Bubble} from "./bubble";
 import {type Entity} from "../interfaces/entity.interface"
 import {clamp, limitMagnitude, pick, rand} from "../utils/math.utils";
+import {bold, color, dim} from "../utils/appearance.utils";
+
+import {drawText} from "../utils/render.utils";
+
 
 export class Fish implements Entity{
     bubble = new Bubble();
@@ -85,7 +88,7 @@ export class Fish implements Entity{
     draw(buffer: { chars: any[][]; colors: any[][]; }) {
         const sorted = [...state.fish].sort((a, b) => a.depth - b.depth);
         for (const fish of sorted) {
-            const body = fish.dir === 1 ? fish.shape : mirrorShape(fish.shape);
+            const body = fish.dir === 1 ? fish.shape : this.mirrorShape(fish.shape);
             const style =
                 fish.depth > 0.66
                     ? bold(fish.color)
@@ -224,4 +227,25 @@ export class Fish implements Entity{
             this.eatNearbyFood(fish);
         }
     }
+    mirrorShape(shape: string) {
+        const pairs: Record<string, string> = {
+            "<": ">",
+            ">": "<",
+            "(": ")",
+            ")": "(",
+            "[": "]",
+            "]": "[",
+            "{": "}",
+            "}": "{",
+            "/": "\\",
+            "\\": "/",
+        };
+
+        return shape
+            .split("")
+            .reverse()
+            .map((char: string) => pairs[char] || char)
+            .join("");
+    }
+
 }

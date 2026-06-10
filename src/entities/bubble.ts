@@ -1,9 +1,11 @@
 import {MAX_BUBBLES} from "../utils/constants";
 import {state} from "@";
-import {color, dim, writeCell} from "../utils/utils";
 import type {BubbleProps} from "../types/bubble.types";
 import type {Entity} from "../interfaces/entity.interface";
 import {pick, rand} from "../utils/math.utils";
+import {color, dim} from "../utils/appearance.utils";
+
+import {writeCell} from "../utils/render.utils";
 
 export class Bubble implements Entity{
     create(width: number, height: number, sourceX = rand(2, width - 2), sourceY = height - 2): BubbleProps {

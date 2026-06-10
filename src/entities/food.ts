@@ -1,9 +1,11 @@
-import {bold, dim, writeCell} from "../utils/utils";
 import {state} from "@";
 import {FEEDING_FRENZY_SECONDS} from "../utils/constants";
 import type {FoodProps} from "../types/food.types";
 import type {Entity} from "../interfaces/entity.interface";
 import {rand} from "../utils/math.utils";
+import {bold, dim} from "../utils/appearance.utils";
+
+import {writeCell} from "../utils/render.utils";
 
 export class Food implements Entity{
     create(width: number): FoodProps {

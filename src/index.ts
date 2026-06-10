@@ -2,13 +2,7 @@
 
 import process from "node:process";
 import {
-    drawBackground,
-    enterAltScreen,
-    hideCursor,
-    leaveAltScreen,
-    printHelp,
-    renderBuffer,
-    showCursor
+    printHelp
 } from "./utils/utils";
 import {FRAME_MS, LIGHTING_MODES, MAX_BUBBLES, MAX_FISH, RESET} from "./utils/constants";
 import {Fish} from "./entities/fish";
@@ -20,6 +14,8 @@ import {Hud} from "./utils/hud";
 import * as readline from "node:readline";
 import type {StateProps} from "./types/state.types.js";
 import {clamp, rand} from "./utils/math.utils";
+import {enterAltScreen, hideCursor, leaveAltScreen, showCursor} from "./utils/appearance.utils";
+import {drawBackground, renderBuffer} from "./utils/render.utils";
 
 export let state: StateProps;
 export let timer: NodeJS.Timeout | null;
