@@ -12,6 +12,7 @@ export class Seaweed implements Entity {
     update(): void {
         throw new Error("Method not implemented.");
     }
+
     create(width: number, height: number): SeaweedProps {
         const stalks: Stalks[] = [];
         const floorY = Math.max(3, height - 2);
@@ -36,15 +37,15 @@ export class Seaweed implements Entity {
                 const x = Math.round(stalk.x + sway);
                 const y = floorY - i;
 
-                // todo: simplify
-                const glyph =
-                    i === stalk.height - 1
-                        ? pick(["'", "`", "."])
-                        : Math.abs(sway) < 0.45
-                            ? "|"
-                            : sway > 0
-                                ? "/"
-                                : "\\";
+                let glyph;
+                if (i === stalk.height - 1) {
+                    glyph = pick(["'", "`", "."]);
+                } else if (Math.abs(sway) < 0.45) {
+                    glyph = "|";
+                } else {
+                    glyph = sway > 0 ? "/" : "\\";
+                }
+
                 writeCell(buffer, x, y, glyph, style);
             }
         }
