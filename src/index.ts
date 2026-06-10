@@ -115,15 +115,15 @@ export function getWaterTone(x: number, y: number) {
 
     const autoDaylight = (Math.sin(state.clock * 0.15 + state.cycleOffset) + 1) / 2;
 
-    // todo: simplify
-    const daylight =
-        state.lightingMode === LIGHTING_MODES.AUTO
-            ? autoDaylight
-            : state.lightingMode === LIGHTING_MODES.NIGHT
-                ? 0.18
-                : state.lightingMode === LIGHTING_MODES.NEON
-                    ? 0.72
-                    : 0.06;
+    const LIGHT_MAP: Record<LIGHTING_MODES, number> = {
+        [LIGHTING_MODES.NIGHT]: 0.18,
+        [LIGHTING_MODES.NEON]: 0.72,
+        [LIGHTING_MODES.ABYSS]: 0.06,
+        [LIGHTING_MODES.AUTO]: autoDaylight,
+    };
+
+    const daylight = LIGHT_MAP[state.lightingMode] ?? 0.06;
+
 
     if (state.lightingMode === LIGHTING_MODES.NEON) {
         const band = Math.sin(state.clock * 0.7 + x * 0.05 + y * 0.09);

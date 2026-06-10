@@ -1,8 +1,8 @@
-export const LIGHTING_MODES = {
-    AUTO: "auto",
-    NIGHT: "night",
-    NEON: "neon",
-    ABYSS: "abyss",
+export enum LIGHTING_MODES {
+    AUTO,
+    NIGHT,
+    NEON,
+    ABYSS
 };
 export const SEAWEED_SPACING = 8;
 
